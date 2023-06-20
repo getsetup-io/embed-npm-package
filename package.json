@@ -1,5 +1,5 @@
 {
-  "name": "@getsetup-io/gsu-embedded-shell",
+  "name": "@getsetup/embed",
   "version": "1.4.0",
   "description": "",
   "source": "src/index.ts",
