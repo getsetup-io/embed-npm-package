@@ -11,7 +11,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/getsetup-io/gsu-web.git"
+    "url": "https://github.com/getsetup-io/embed-npm-package.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
     "test": "jest",
