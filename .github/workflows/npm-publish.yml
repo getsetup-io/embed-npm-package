@@ -20,6 +20,7 @@ jobs:
       - run: npm ci
       - run: npm test
 
+      # Writes the version.json file and sets a tag on the version for non-main builds.
       - name: Set package version
         run: node ./.github/workflows/setPackageVersion.js
         env:
@@ -28,6 +29,14 @@ jobs:
 
       - run: npm run build
 
+      # Publishes the package with a beta tag if this is a prerelease.
+      - run: npm publish --access public --tag beta
+        if: ${{ github.event.release.prerelease }}
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
+
+      # Publishes the package with the latest tag if this is not a prerelease.
       - run: npm publish --access public
+        if: ${{ !github.event.release.prerelease }}
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
