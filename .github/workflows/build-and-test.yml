@@ -19,7 +19,8 @@ jobs:
       - name: Set package version
         run: node ./.github/workflows/setPackageVersion.js
         env:
-          CI_BRANCH: ${{github.ref}}
+          REF_NAME: ${{github.ref_name}}
           COMMIT_SHA: ${{github.sha}}
+          IS_PRERELEASE: true
 
       - run: npm run build
