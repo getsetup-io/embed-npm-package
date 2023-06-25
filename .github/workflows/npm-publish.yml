@@ -20,12 +20,13 @@ jobs:
       - run: npm ci
       - run: npm test
 
-      # Writes the version.json file and sets a tag on the version for non-main builds.
+      # Writes the version.json file and sets a tag on the version for prerelease builds.
       - name: Set package version
         run: node ./.github/workflows/setPackageVersion.js
         env:
-          CI_BRANCH: ${{github.ref}}
+          REF_NAME: ${{github.ref_name}}
           COMMIT_SHA: ${{github.sha}}
+          IS_PRERELEASE: ${{ github.event.release.prerelease }}
 
       - run: npm run build
 
