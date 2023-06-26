@@ -11,8 +11,9 @@ const date = currentDate.toISOString().replace(/:/g, '');
 
 console.log(`Git Ref: ${gitRef}`);
 console.log(`commitSha: ${commitSha}`);
+console.log(`IS_PRERELEASE: ${process.env.IS_PRERELEASE}`);
 
-if (process.env.IS_PRERELEASE) {
+if (process.env.IS_PRERELEASE === 'true') {
   // Only add a tag to the version if we are releasing a prerelease.
   packageJsonContent.version = `${packageJsonContent.version}-${gitRef}-${date}-${commitSha}`;
 }
