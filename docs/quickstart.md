@@ -1,8 +1,8 @@
 # Setup
 
-## CORS
+## CORS & CSP
 
-The GetSetUp Embedded product requires some CORS configuration by GetSetUp to allow other sites access. We have configured access for https://uat-aperture.imds.tv and http://localhost:3001. If you require access for other development urls please contact mitchell@getsetup.io.
+The GetSetUp Embedded product requires some CORS and CSP configuration by GetSetUp to allow other sites access. We have configured access for http://localhost:3001. If you require access for other development urls please contact mitchell@getsetup.io.
 
 ## Site layout
 
@@ -11,9 +11,7 @@ The second page is the "joinClass" page that hosts the video viewing and chat ex
 
 ## How to install locally
 
-1. Save the package to disk locally.
-2. In your project, run `npm install /path/to/package/getsetup-io-embed-1.2.0.tgz`
-
+In your project, run `npm install @getsetup/embed`
 The next step is to import and configure the package on a couple of pages.
 
 ### Browsing page
@@ -25,7 +23,7 @@ First on a page where you want the class browsing experience create a div and se
 ```
 
 ```ts
-import * as GSU from "@getsetup-io/embed";
+import * as GSU from "@getsetup/embed";
 
 // This function is supplied by the hosting page.
 // We assume a simple navigation scheme, and we will ignore classSlug for now.
@@ -76,7 +74,7 @@ Then on a second page where you want the user to watch the class:
 ```
 
 ```ts
-import * as GSU from "@getsetup-io/embed";
+import * as GSU from "@getsetup/embed";
 
 // This function is supplied by the hosting page.
 // We assume a simple navigation scheme, and we will ignore classSlug for now.
