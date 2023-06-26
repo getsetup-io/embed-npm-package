@@ -5,7 +5,7 @@ This package is intended for partners of GetSetUp to include into their build pr
 At the moment this package is only available if you have been given access to GetSetUp's GitHub npm repository. After you have access and your `.npmrc` is configured appropriately you can just:
 
 ```sh
-npm i @getsetup-io/embed
+npm i @getsetup/embed
 ```
 
 ## Versioning
@@ -13,7 +13,7 @@ This package follows [semver](https://semver.org/).
 
 ## Quick Start Example
 ```ts
-import * as GSU from '@getsetup-io/embed'
+import * as GSU from '@getsetup/embed'
 
 // This function is supplied by the hosting page.
 // They should preform any checking and sanitation they wish to here.
