@@ -34,6 +34,42 @@ export interface IframeStatusMessage {
   message: string
 }
 
+export interface NavigationCallBacks {
+  /**
+   * This function is called when the iframe needs to navigate to the page hosting the joinClass iframe.
+   * E.G: to go from `hostsite.com/online-classes/catalogue` to `hostsite.com/online-classes/join-session/98hsfnb498ywh4`
+   * @param sessionId If the page is the joinClass page, then sessionId must be passed back to the createIframe function on the new page.
+   * @param classSlug If the page is the joinClass page, then the classSlug will be sent to this callback. The classSlug is only for SEO use on the parent page, it is not required to be passed back to the createIframe function.
+   */
+  joinClass: (sessionId?: string, classSlug?: string) => void
+  /**
+   * This function is called when the iframe needs to navigate to the page hosting the joinClass iframe.
+   * E.G: to go from `hostsite.com/online-classes/join-session/98hsfnb498ywh4` to `hostsite.com/online-classes/learn`
+   */
+  learn: () => void
+  /**
+   * This function is called when the iframe needs to navigate to the page hosting the joinClass iframe.
+   * E.G: to go from `hostsite.com/online-classes/join-session/98hsfnb498ywh4` to `hostsite.com/online-classes/fitness`
+   */
+  fitness: () => void
+  /**
+   * This function is called when the user has clicked the help button in the iframe.
+   * The hoisting site could navigate to a help page, or show a modal, or whatever is appropriate.
+   */
+  help?: () => void
+  /**
+   * This function is called when the user wants to login to the chat provided in the joinClass page.
+   * The hoisting site should log the user in and return them to the current page.
+   * If this function is not supplied then chat functionally will be disabled.
+   */
+  login?: () => void
+  /**
+   * This function is called when the user has clicked the host's logo in the joinClass iframe.
+   * The hosting site should navigate as appropriate.
+   */
+  home?: () => void
+}
+
 export interface CreateIframeOptions {
   /** The children of this target element will be replaced with the iframe embedded GetSetUp content. */
   targetElementId: string
@@ -50,7 +86,9 @@ export interface CreateIframeOptions {
   /** A stable id for the device the user is using to access the parent page. Used to report analytics back to your organisation. */
   deviceId?: string
 
-  /** A flag for disabling the chat tab on the `joinClass` page. If this is true then the `tokenRequestCallBack` is not required. */
+  /** A flag for disabling the chat tab on the `joinClass` page. If this is true then the `tokenRequestCallBack` is not required.
+   * @deprecated If you do not supply {@link NavigationCallBacks.loginNavigation} to {@link navigationCallBacks} chat will be disabled.
+   */
   disableChat?: boolean
 
   /**
@@ -59,8 +97,16 @@ export interface CreateIframeOptions {
    * @param navigationAction The page to navigate to. If this is `login` the parent page should start a login flow and redirect the user to the current page once they are logged in.
    * @param sessionId If the page is the joinClass page, then sessionId must be passed back to the createIframe function on the new page.
    * @param classSlug If the page is the joinClass page, then the classSlug will be sent to this callback. The classSlug is only for SEO use on the parent page, it is not required to be passed back to the createIframe function.
+   * @deprecated Use the new {@link navigationCallBacks} structure instead.
+   * This is optional to allow the transition from this to the `navigationCallBacks` structure. An error will be thrown if neither are supplied.
    */
-  navigationCallBack: (navigationAction: NavigationAction, sessionId?: string, classSlug?: string) => void
+  navigationCallBack?: (navigationAction: NavigationAction, sessionId?: string, classSlug?: string) => void
+
+  /**
+   * A set of callbacks that the iframe uses to ask the hosting page to navigate in response to user's actions.
+   * This is optional to allow the transition from the {@link navigationCallBack} to this. An error will be thrown if neither are supplied.
+   */
+  navigationCallBacks?: NavigationCallBacks
 
   /**
    * This function is called when the iframe needs a token.
@@ -132,6 +178,7 @@ export function createIframe({
   deviceId,
   disableChat,
   navigationCallBack,
+  navigationCallBacks,
   tokenRequestCallBack,
   statusCallBack,
   linkTemplates,
@@ -237,7 +284,10 @@ export function createIframe({
     targetElement.appendChild(gsuEmbeddedIframe)
   }
 
-  tellHostingPageIframeStatus({ status: IframeStatus.LOADING, message: 'The GetSetUp iframe is currently loading.' })
+  tellHostingPageIframeStatus({
+    status: IframeStatus.LOADING,
+    message: 'The GetSetUp iframe is currently loading.',
+  })
 
   const originsFromTargetUrls = Object.entries(targetPages).map(([_key, value]) => new URL(value).origin)
 
@@ -283,7 +333,16 @@ export function createIframe({
         const classSlug = event.data.gsuNavigation.classSlug
         // Make sure the page we are asking the hosting page to navigate to is a valid one of the targetPages we support.
         if (Object.keys(navigationActions).includes(pageToNavigateTo)) {
-          navigationCallBack(pageToNavigateTo, sessionId, classSlug)
+          if (navigationCallBack) {
+            navigationCallBack(pageToNavigateTo, sessionId, classSlug)
+          } else if (navigationCallBacks) {
+            const navigationFunctionToCall = navigationCallBacks[pageToNavigateTo as NavigationAction]
+            if (navigationFunctionToCall) {
+              navigationFunctionToCall(sessionId, classSlug)
+            }
+            // TODO: throw errors if the function is undefined, meaning the page tried to call a navigation the hosting page didn't want to use.
+          }
+          // TODO: throw errors if the navigation callback(s) aren't supplied.
         }
       } else if (event.data.gsuAnchorNavigation) {
         // We got a request from the iframe to scroll to a location pointed to by an <a href="#sectionName">
