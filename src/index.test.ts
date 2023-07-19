@@ -664,4 +664,25 @@ describe('GSU Embedded Shell', () => {
     // Once for the head request, once for the loading failed report.
     expect(global.fetch).toBeCalledTimes(2)
   })
+
+  test('sends the disableChat query string if required', () => {
+    document.body.innerHTML = '<div id="gsuTarget"></div>'
+
+    createIframe({
+      targetElementId: 'gsuTarget',
+      targetPage: 'fitness',
+      navigationCallBack: mockNavCallback,
+      embeddingOrgId: 'AOL',
+      tokenRequestCallBack: mockTokenCallback,
+      disableChat: true,
+    })
+
+    const gsuTargetChildren = queryByAttribute('id', document.body, 'gsuTarget')?.children
+    expect(gsuTargetChildren).not.toBeNull()
+    expect(gsuTargetChildren).not.toBeUndefined()
+    expect(gsuTargetChildren!.length).toBe(1)
+
+    const gsuIframe = gsuTargetChildren![0]
+    expect(gsuIframe).toHaveAttribute('src', expect.stringContaining('disable-chat=true'))
+  })
 })
