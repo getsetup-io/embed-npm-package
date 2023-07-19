@@ -54,12 +54,12 @@ export interface NavigationCallBacks {
   fitness: () => void
   /**
    * This function is called when the user has clicked the help button in the iframe.
-   * The hoisting site could navigate to a help page, or show a modal, or whatever is appropriate.
+   * The hosting site could navigate to a help page, or show a modal, or whatever is appropriate.
    */
   help?: () => void
   /**
    * This function is called when the user wants to login to the chat provided in the joinClass page.
-   * The hoisting site should log the user in and return them to the current page.
+   * The hosting site should log the user in and return them to the current page.
    * If this function is not supplied then chat functionally will be disabled.
    */
   login?: () => void
