@@ -53,6 +53,9 @@ export interface CreateIframeOptions {
   /** A flag for disabling the chat tab on the `joinClass` page. If this is true then the `tokenRequestCallBack` is not required. */
   disableChat?: boolean
 
+  /** A flag for disabling the help link on the `joinClass` page. */
+  disableHelp?: boolean
+
   /**
    * This function is called when the iframe needs to navigate the top level URL.
    * E.G: to go from `hostsite.com/online-classes/catalogue` to `hostsite.com/online-classes/join-session/98hsfnb498ywh4`
@@ -131,6 +134,7 @@ export function createIframe({
   embeddingOrgId,
   deviceId,
   disableChat,
+  disableHelp,
   navigationCallBack,
   tokenRequestCallBack,
   statusCallBack,
@@ -164,6 +168,7 @@ export function createIframe({
   iframeSrc.searchParams.append('embedding-org-id', normalisedOrgId)
   if (deviceId) iframeSrc.searchParams.append('device-id', deviceId)
   if (disableChat) iframeSrc.searchParams.append('disable-chat', 'true')
+  if (disableHelp) iframeSrc.searchParams.append('disable-help', 'true')
 
   // Pass the join class link template to allow the page to construct hosting site links for SEO.
   if (linkTemplates?.joinClass) iframeSrc.searchParams.append('link-template-join-class', linkTemplates?.joinClass)
