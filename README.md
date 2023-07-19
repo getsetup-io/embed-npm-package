@@ -76,7 +76,10 @@ export interface CreateIframeOptions {
   /** The id of your organisation as issued to you by GetSetUp. */
   embeddingOrgId: string
 
-  /** A stable id for the device the user is using to access the parent page. Used to report analytics back to your organisation. */
+  /**
+   * A stable id for the device the user is using to access the parent page. Used to report analytics back to your organisation.
+   * @deprecated Use {@link analyticsInfo} instead. This will be removed in a future version.
+   */
   deviceId?: string
 
   /** A flag for disabling the chat tab on the `joinClass` page. If this is true then the `tokenRequestCallBack` is not required. */
@@ -143,6 +146,14 @@ export interface CreateIframeOptions {
     /** This image will be displayed in the side bar of the `joinClass` page. */
     logoUrl?: string
   }
+
+  /** Information used to report analytics back to your organisation. */
+  analyticsInfo?: {
+    /** The domain of the site that is hosting the embed. */
+    domain?: string
+    /** A stable id for the device the user is using to access the parent page. */
+    deviceId?: string
+  }
 }
 
 ```
@@ -168,6 +179,7 @@ export interface CreateIframeOptions {
 ```
 - `loadingTimeoutInMs` (OPTIONAL): Allows the caller to override the loading timeout. After this timeout expires the iframe loading is marked as failed and the script shows an error message to the user. This can lead to problems if running locally or in a testing environment, so callers can use this option to set a longer timeout if needed. It is recommended that you do not use this option in production.
 - `themeOptions` (OPTIONAL): A set of options to allow the caller to control the theme rendered inside the iframe.More options will be added to this over time.
+- `analyticsInfo` (OPTIONAL): Information used to report analytics back to your organisation.
 
 #### Navigation Actions
 The `navigationCallBack` is passed a `navigationAction` argument that is one of the following strings:

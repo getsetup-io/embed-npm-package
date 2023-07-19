@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The `disableHelp` option.
 - The first of the `themeOptions`, the `logoUrl`.
+- The `analyticsInfo` option. This is information used to report analytics back to your organisation.
+
+### Deprecated
+
+- The `deviceId` option. This is being replaced by `analyticsInfo.deviceId`.
 
 ## [1.4.1] - 2023-06-27
 

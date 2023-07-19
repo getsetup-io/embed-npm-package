@@ -717,7 +717,7 @@ describe('GSU Embedded Shell', () => {
       embeddingOrgId: 'AOL',
       tokenRequestCallBack: mockTokenCallback,
       themeOptions: {
-        logoUrl: 'https://example.com/logo.svg',
+        logoUrl: 'https://example.com/1logo.svg',
       },
     })
 
@@ -728,14 +728,77 @@ describe('GSU Embedded Shell', () => {
 
     const gsuIframe = gsuTargetChildren![0]
 
+    //We need to encode this twice to match the encode and the encode that searchParams.append does on top.
     const themeOptionsEncoded = encodeURIComponent(
-      btoa(
-        JSON.stringify({
-          logoUrl: 'https://example.com/logo.svg',
-        }),
+      encodeURIComponent(
+        btoa(
+          JSON.stringify({
+            logoUrl: 'https://example.com/1logo.svg',
+          }),
+        ),
       ),
     )
 
     expect(gsuIframe).toHaveAttribute('src', expect.stringContaining(`theme-options=${themeOptionsEncoded}`))
+  })
+
+  test('sends the deviceId query string if required', () => {
+    document.body.innerHTML = '<div id="gsuTarget"></div>'
+
+    createIframe({
+      targetElementId: 'gsuTarget',
+      targetPage: 'fitness',
+      navigationCallBack: mockNavCallback,
+      embeddingOrgId: 'AOL',
+      tokenRequestCallBack: mockTokenCallback,
+      deviceId: 'o980asd09uan89',
+    })
+
+    const gsuTargetChildren = queryByAttribute('id', document.body, 'gsuTarget')?.children
+    expect(gsuTargetChildren).not.toBeNull()
+    expect(gsuTargetChildren).not.toBeUndefined()
+    expect(gsuTargetChildren!.length).toBe(1)
+
+    const gsuIframe = gsuTargetChildren![0]
+    expect(gsuIframe).toHaveAttribute('src', expect.stringContaining('device-id=o980asd09uan89'))
+  })
+
+  test('sends the analyticsInfo query string if required', () => {
+    document.body.innerHTML = '<div id="gsuTarget"></div>'
+
+    createIframe({
+      targetElementId: 'gsuTarget',
+      targetPage: 'fitness',
+      navigationCallBack: mockNavCallback,
+      embeddingOrgId: 'AOL',
+      tokenRequestCallBack: mockTokenCallback,
+      analyticsInfo: {
+        domain: 'example.com',
+        deviceId: 'o980asd09uan89',
+      },
+    })
+
+    const gsuTargetChildren = queryByAttribute('id', document.body, 'gsuTarget')?.children
+    expect(gsuTargetChildren).not.toBeNull()
+    expect(gsuTargetChildren).not.toBeUndefined()
+    expect(gsuTargetChildren!.length).toBe(1)
+
+    const gsuIframe = gsuTargetChildren![0]
+
+    //We need to encode this twice to match the encode and the encode that searchParams.append does on top.
+    const analyticsInfoEncoded = encodeURIComponent(
+      encodeURIComponent(
+        btoa(
+          JSON.stringify({
+            domain: 'example.com',
+            deviceId: 'o980asd09uan89',
+          }),
+        ),
+      ),
+    )
+
+    expect(gsuIframe).toHaveAttribute('src', expect.stringContaining(`analytics-info=${analyticsInfoEncoded}`))
+    // For backwards compatibility we also send the old device-id query string. This should be removed at some point.
+    expect(gsuIframe).toHaveAttribute('src', expect.stringContaining('device-id=o980asd09uan89'))
   })
 })

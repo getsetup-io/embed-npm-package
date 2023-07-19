@@ -47,7 +47,10 @@ export interface CreateIframeOptions {
   /** The id of your organisation as issued to you by GetSetUp. */
   embeddingOrgId: string
 
-  /** A stable id for the device the user is using to access the parent page. Used to report analytics back to your organisation. */
+  /**
+   * A stable id for the device the user is using to access the parent page. Used to report analytics back to your organisation.
+   * @deprecated Use {@link analyticsInfo} instead. This will be removed in a future version.
+   */
   deviceId?: string
 
   /** A flag for disabling the chat tab on the `joinClass` page. If this is true then the `tokenRequestCallBack` is not required. */
@@ -109,6 +112,14 @@ export interface CreateIframeOptions {
     /** This image will be displayed in the side bar of the `joinClass` page. */
     logoUrl?: string
   }
+
+  /** Information used to report analytics back to your organisation. */
+  analyticsInfo?: {
+    /** The domain of the site that is hosting the embed. */
+    domain?: string
+    /** A stable id for the device the user is using to access the parent page. */
+    deviceId?: string
+  }
 }
 
 export interface IframeInstance {
@@ -151,6 +162,7 @@ export function createIframe({
   targetUrls,
   loadingTimeoutInMs,
   themeOptions,
+  analyticsInfo,
 }: CreateIframeOptions): IframeInstance {
   if (targetPage == 'joinClass' && !sessionId) {
     throw new Error('sessionId is required if you are loading a join class page.')
@@ -176,12 +188,23 @@ export function createIframe({
 
   const iframeSrc = new URL(targetPages[targetPage])
   iframeSrc.searchParams.append('embedding-org-id', normalisedOrgId)
+  // This device-id method is deprecated, it should be removed in a future version.
   if (deviceId) iframeSrc.searchParams.append('device-id', deviceId)
   if (disableChat) iframeSrc.searchParams.append('disable-chat', 'true')
   if (disableHelp) iframeSrc.searchParams.append('disable-help', 'true')
   if (themeOptions) {
     const themeOptionsEncoded = encodeURIComponent(btoa(JSON.stringify(themeOptions)))
     iframeSrc.searchParams.append('theme-options', themeOptionsEncoded)
+  }
+  if (analyticsInfo) {
+    const analyticsInfoEncoded = encodeURIComponent(btoa(JSON.stringify(analyticsInfo)))
+    iframeSrc.searchParams.append('analytics-info', analyticsInfoEncoded)
+
+    if (analyticsInfo.deviceId) {
+      // This will override the previous device-id above, but that's what we want.
+      // The other device-id method is deprecated, both of these should be removed in a future version.
+      if (analyticsInfo.deviceId) iframeSrc.searchParams.append('device-id', analyticsInfo.deviceId)
+    }
   }
 
   // Pass the join class link template to allow the page to construct hosting site links for SEO.
