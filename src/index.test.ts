@@ -664,4 +664,77 @@ describe('GSU Embedded Shell', () => {
     // Once for the head request, once for the loading failed report.
     expect(global.fetch).toBeCalledTimes(2)
   })
+
+  test('sends the disableChat query string if disableChat option is set', () => {
+    document.body.innerHTML = '<div id="gsuTarget"></div>'
+
+    createIframe({
+      targetElementId: 'gsuTarget',
+      targetPage: 'fitness',
+      navigationCallBack: mockNavCallback,
+      embeddingOrgId: 'AOL',
+      tokenRequestCallBack: mockTokenCallback,
+      disableChat: true,
+      navigationCallBacks: {
+        joinClass: () => {},
+        learn: () => {},
+        fitness: () => {},
+        login: () => {},
+      },
+    })
+
+    const gsuTargetChildren = queryByAttribute('id', document.body, 'gsuTarget')?.children
+    expect(gsuTargetChildren).not.toBeNull()
+    expect(gsuTargetChildren).not.toBeUndefined()
+    expect(gsuTargetChildren!.length).toBe(1)
+
+    const gsuIframe = gsuTargetChildren![0]
+    expect(gsuIframe).toHaveAttribute('src', expect.stringContaining('disable-chat=true'))
+  })
+
+  test('sends the disableChat query string if login navigation function is not provided', () => {
+    document.body.innerHTML = '<div id="gsuTarget"></div>'
+
+    createIframe({
+      targetElementId: 'gsuTarget',
+      targetPage: 'fitness',
+      navigationCallBack: mockNavCallback,
+      embeddingOrgId: 'AOL',
+      tokenRequestCallBack: mockTokenCallback,
+    })
+
+    const gsuTargetChildren = queryByAttribute('id', document.body, 'gsuTarget')?.children
+    expect(gsuTargetChildren).not.toBeNull()
+    expect(gsuTargetChildren).not.toBeUndefined()
+    expect(gsuTargetChildren!.length).toBe(1)
+
+    const gsuIframe = gsuTargetChildren![0]
+    expect(gsuIframe).toHaveAttribute('src', expect.stringContaining('disable-chat=true'))
+  })
+
+  test('does not send the disableChat query string if login navigation function is provided', () => {
+    document.body.innerHTML = '<div id="gsuTarget"></div>'
+
+    createIframe({
+      targetElementId: 'gsuTarget',
+      targetPage: 'fitness',
+      navigationCallBack: mockNavCallback,
+      embeddingOrgId: 'AOL',
+      tokenRequestCallBack: mockTokenCallback,
+      navigationCallBacks: {
+        joinClass: () => {},
+        learn: () => {},
+        fitness: () => {},
+        login: () => {},
+      },
+    })
+
+    const gsuTargetChildren = queryByAttribute('id', document.body, 'gsuTarget')?.children
+    expect(gsuTargetChildren).not.toBeNull()
+    expect(gsuTargetChildren).not.toBeUndefined()
+    expect(gsuTargetChildren!.length).toBe(1)
+
+    const gsuIframe = gsuTargetChildren![0]
+    expect(gsuIframe).toHaveAttribute('src', expect.not.stringContaining('disable-chat=true'))
+  })
 })
