@@ -210,7 +210,7 @@ export function createIframe({
   const iframeSrc = new URL(targetPages[targetPage])
   iframeSrc.searchParams.append('embedding-org-id', normalisedOrgId)
   if (deviceId) iframeSrc.searchParams.append('device-id', deviceId)
-  if (disableChat) iframeSrc.searchParams.append('disable-chat', 'true')
+  if (disableChat || !navigationCallBacks?.login) iframeSrc.searchParams.append('disable-chat', 'true')
 
   // Pass the join class link template to allow the page to construct hosting site links for SEO.
   if (linkTemplates?.joinClass) iframeSrc.searchParams.append('link-template-join-class', linkTemplates?.joinClass)
