@@ -685,4 +685,25 @@ describe('GSU Embedded Shell', () => {
     const gsuIframe = gsuTargetChildren![0]
     expect(gsuIframe).toHaveAttribute('src', expect.stringContaining('disable-chat=true'))
   })
+
+  test('sends the disableHelp query string if required', () => {
+    document.body.innerHTML = '<div id="gsuTarget"></div>'
+
+    createIframe({
+      targetElementId: 'gsuTarget',
+      targetPage: 'fitness',
+      navigationCallBack: mockNavCallback,
+      embeddingOrgId: 'AOL',
+      tokenRequestCallBack: mockTokenCallback,
+      disableHelp: true,
+    })
+
+    const gsuTargetChildren = queryByAttribute('id', document.body, 'gsuTarget')?.children
+    expect(gsuTargetChildren).not.toBeNull()
+    expect(gsuTargetChildren).not.toBeUndefined()
+    expect(gsuTargetChildren!.length).toBe(1)
+
+    const gsuIframe = gsuTargetChildren![0]
+    expect(gsuIframe).toHaveAttribute('src', expect.stringContaining('disable-help=true'))
+  })
 })

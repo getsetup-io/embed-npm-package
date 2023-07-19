@@ -82,6 +82,9 @@ export interface CreateIframeOptions {
   /** A flag for disabling the chat tab on the `joinClass` page. If this is true then the `tokenRequestCallBack` is not required. */
   disableChat?: boolean
 
+  /** A flag for disabling the help link on the `joinClass` page. */
+  disableHelp?: boolean
+
   /**
    * This function is called when the iframe needs to navigate the top level URL.
    * E.G: to go from `hostsite.com/online-classes/catalogue` to `hostsite.com/online-classes/join-session/98hsfnb498ywh4`
@@ -141,6 +144,7 @@ export interface CreateIframeOptions {
 - `embeddingOrgId` (REQUIRED): The id string for your organisation that was issues to you by GetSetUp. Used by GetSetUp to tailor content to your organisation.
 - `deviceId` (OPTIONAL): This is an optional id used for analytics that will be reported back to your organisation.
 - `disableChat` (OPTIONAL): This is an optional flag that will disable the chat tab on the `joinClass` page. If this is true then the `tokenRequestCallBack` is not required.
+- `disableHelp` (OPTIONAL): This is an optional flag that will disable the help link chat on the `joinClass` page.
 - `navigationCallBack` (REQUIRED): This is used to navigate between pages on the hosting site, from class listings to the page that embeds the video of the class. It is passed the `navigationAction` (`"learn" | "fitness" | "joinClass" | "login" | "home" | "help"`) and if the `navigationAction` is `"joinClass"` is is also passed the `sessionId` and `classSlug` of the class the user wants to join. The hosting site should deal with these navigation requests as appropriate.
 - `tokenRequestCallBack` (OPTIONAL): This callback is used to get a token from the hosting page. This token is used for chat authorization, so this callback is optional if you have disabled chat, otherwise this callback is required. This callback is called when the iframe loads or the current token expires. The callback must return An encrypted JWT (JWE) that was encrypted with the public key given to you by GetSetUp. That token maybe returned as a pain string, or as a string inside a promise if your token generation is async. If no token is available (E.g. the user is not logged into your site) you may return `null`, `undefined`, nothing (`void`) or a promise that resolves to any of those. Details on constructing the token are below in the [Token](#token) section.
 - `statusCallBack` (OPTIONAL): This callback is called when the iframe is loading, has loaded, or errors. The object that is passed to this function has a `status` and a `message`. Both of those fields are for intended to inform developers what the iframe is doing, they SHOULD NOT be shown to users.
