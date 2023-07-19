@@ -706,4 +706,36 @@ describe('GSU Embedded Shell', () => {
     const gsuIframe = gsuTargetChildren![0]
     expect(gsuIframe).toHaveAttribute('src', expect.stringContaining('disable-help=true'))
   })
+
+  test('sends the themeOptions query string if required', () => {
+    document.body.innerHTML = '<div id="gsuTarget"></div>'
+
+    createIframe({
+      targetElementId: 'gsuTarget',
+      targetPage: 'fitness',
+      navigationCallBack: mockNavCallback,
+      embeddingOrgId: 'AOL',
+      tokenRequestCallBack: mockTokenCallback,
+      themeOptions: {
+        logoUrl: 'https://example.com/logo.svg',
+      },
+    })
+
+    const gsuTargetChildren = queryByAttribute('id', document.body, 'gsuTarget')?.children
+    expect(gsuTargetChildren).not.toBeNull()
+    expect(gsuTargetChildren).not.toBeUndefined()
+    expect(gsuTargetChildren!.length).toBe(1)
+
+    const gsuIframe = gsuTargetChildren![0]
+
+    const themeOptionsEncoded = encodeURIComponent(
+      btoa(
+        JSON.stringify({
+          logoUrl: 'https://example.com/logo.svg',
+        }),
+      ),
+    )
+
+    expect(gsuIframe).toHaveAttribute('src', expect.stringContaining(`theme-options=${themeOptionsEncoded}`))
+  })
 })

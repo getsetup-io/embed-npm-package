@@ -100,6 +100,15 @@ export interface CreateIframeOptions {
    * This value is in milliseconds.
    */
   loadingTimeoutInMs?: number
+
+  /**
+   * A set of options to allow the caller to control the theme rendered inside the iframe.
+   * More options will be added to this over time.
+   */
+  themeOptions?: {
+    /** This image will be displayed in the side bar of the `joinClass` page. */
+    logoUrl?: string
+  }
 }
 
 export interface IframeInstance {
@@ -141,6 +150,7 @@ export function createIframe({
   linkTemplates,
   targetUrls,
   loadingTimeoutInMs,
+  themeOptions,
 }: CreateIframeOptions): IframeInstance {
   if (targetPage == 'joinClass' && !sessionId) {
     throw new Error('sessionId is required if you are loading a join class page.')
@@ -169,6 +179,10 @@ export function createIframe({
   if (deviceId) iframeSrc.searchParams.append('device-id', deviceId)
   if (disableChat) iframeSrc.searchParams.append('disable-chat', 'true')
   if (disableHelp) iframeSrc.searchParams.append('disable-help', 'true')
+  if (themeOptions) {
+    const themeOptionsEncoded = encodeURIComponent(btoa(JSON.stringify(themeOptions)))
+    iframeSrc.searchParams.append('theme-options', themeOptionsEncoded)
+  }
 
   // Pass the join class link template to allow the page to construct hosting site links for SEO.
   if (linkTemplates?.joinClass) iframeSrc.searchParams.append('link-template-join-class', linkTemplates?.joinClass)

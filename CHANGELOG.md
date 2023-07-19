@@ -7,9 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [UNRELEASED] - TBC
 
-### Changed
+### Added
 
-- Added the `disableHelp` option.
+- The `disableHelp` option.
+- The first of the `themeOptions`, the `logoUrl`.
 
 ## [1.4.1] - 2023-06-27
 
