@@ -134,6 +134,15 @@ export interface CreateIframeOptions {
    * This value is in milliseconds.
    */
   loadingTimeoutInMs?: number
+
+  /**
+   * A set of options to allow the caller to control the theme rendered inside the iframe.
+   * More options will be added to this over time.
+   */
+  themeOptions?: {
+    /** This image will be displayed in the side bar of the `joinClass` page. */
+    logoUrl?: string
+  }
 }
 
 ```
@@ -158,6 +167,7 @@ export interface CreateIframeOptions {
 }
 ```
 - `loadingTimeoutInMs` (OPTIONAL): Allows the caller to override the loading timeout. After this timeout expires the iframe loading is marked as failed and the script shows an error message to the user. This can lead to problems if running locally or in a testing environment, so callers can use this option to set a longer timeout if needed. It is recommended that you do not use this option in production.
+- `themeOptions` (OPTIONAL): A set of options to allow the caller to control the theme rendered inside the iframe.More options will be added to this over time.
 
 #### Navigation Actions
 The `navigationCallBack` is passed a `navigationAction` argument that is one of the following strings:
