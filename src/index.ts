@@ -200,11 +200,9 @@ export function createIframe({
     const analyticsInfoEncoded = encodeURIComponent(btoa(JSON.stringify(analyticsInfo)))
     iframeSrc.searchParams.append('analytics-info', analyticsInfoEncoded)
 
-    if (analyticsInfo.deviceId) {
-      // This will override the previous device-id above, but that's what we want.
-      // The other device-id method is deprecated, both of these should be removed in a future version.
-      if (analyticsInfo.deviceId) iframeSrc.searchParams.append('device-id', analyticsInfo.deviceId)
-    }
+    // This will override the previous device-id above, but that's what we want.
+    // The other device-id method is deprecated, both of these should be removed in a future version.
+    if (analyticsInfo.deviceId) iframeSrc.searchParams.set('device-id', analyticsInfo.deviceId)
   }
 
   // Pass the join class link template to allow the page to construct hosting site links for SEO.
