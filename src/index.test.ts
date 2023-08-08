@@ -801,4 +801,28 @@ describe('GSU Embedded Shell', () => {
     // For backwards compatibility we also send the old device-id query string. This should be removed at some point.
     expect(gsuIframe).toHaveAttribute('src', expect.stringContaining('device-id=o980asd09uan89'))
   })
+
+  test('sends the linkTemplates query string if required', () => {
+    document.body.innerHTML = '<div id="gsuTarget"></div>'
+
+    createIframe({
+      targetElementId: 'gsuTarget',
+      targetPage: 'fitness',
+      navigationCallBack: mockNavCallback,
+      embeddingOrgId: 'AOL',
+      tokenRequestCallBack: mockTokenCallback,
+      linkTemplates: {joinClass: 'link-template-join-class', navigationPath: '/fitness'},
+    })
+
+    const gsuTargetChildren = queryByAttribute('id', document.body, 'gsuTarget')?.children
+    expect(gsuTargetChildren).not.toBeNull()
+    expect(gsuTargetChildren).not.toBeUndefined()
+    expect(gsuTargetChildren!.length).toBe(1)
+
+    const gsuIframe = gsuTargetChildren![0]
+
+    expect(gsuIframe).toHaveAttribute('src', expect.stringContaining(`/fitness`))
+    expect(gsuIframe).toHaveAttribute('src', expect.stringContaining(`link-template-join-class`))
+
+  })
 })
