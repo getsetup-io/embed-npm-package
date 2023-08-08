@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2023-08-08
+
+### Added
+
+- `linkTemplates.navigationPath`: An option to pass in a URL template that will be used to construct links from one browse page to another.
+
 ## [1.5.0] - 2023-07-26
 
 ### Added
