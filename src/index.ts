@@ -93,6 +93,16 @@ export interface CreateIframeOptions {
      * For example: `https://example.com/classes/{classSlug}/{sessionId}` could become `https://example.com/classes/cooking-with-rice/83bas8dfba`.
      */
     joinClass?: string
+    /**
+     * This template should be the URL of the learn page on your site.
+     * For example: `https://example.com/online-classes/learn/`.
+     */
+    learnPage?: string
+    /**
+     * This template should be the URL of the fitness page on your site.
+     * For example: `https://example.com/online-classes/fitness/`.
+     */
+    fitnessPage?: string
   }
 
   /** Optional - Allows the caller to override urls that will be loaded in the iframe. Used for testing. */
@@ -207,6 +217,13 @@ export function createIframe({
 
   // Pass the join class link template to allow the page to construct hosting site links for SEO.
   if (linkTemplates?.joinClass) iframeSrc.searchParams.append('link-template-join-class', linkTemplates?.joinClass)
+
+  // Pass the navigation path link template to allow the page to construct hosting site links for SEO.
+  if (linkTemplates?.learnPage) iframeSrc.searchParams.append('link-template-navigation-path', linkTemplates?.learnPage)
+
+  // Pass the navigation path link template to allow the page to construct hosting site links for SEO.
+  if (linkTemplates?.fitnessPage)
+    iframeSrc.searchParams.append('link-template-navigation-path', linkTemplates?.fitnessPage)
 
   const tellHostingPageIframeStatus = errorReporter({
     statusCallBack,
