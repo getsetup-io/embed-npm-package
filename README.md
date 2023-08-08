@@ -121,6 +121,16 @@ export interface CreateIframeOptions {
      * For example: `https://example.com/classes/{classSlug}/{sessionId}` could become `https://example.com/classes/cooking-with-rice/83bas8dfba`.
      */
     joinClass?: string
+    /**
+     * This template should be the URL of the learn page on your site.
+     * For example: `https://example.com/online-classes/learn/`.
+     */
+    learnPage?: string
+    /**
+     * This template should be the URL of the fitness page on your site.
+     * For example: `https://example.com/online-classes/fitness/`.
+     */
+    fitnessPage?: string
   }
 
   /**
@@ -168,7 +178,9 @@ export interface CreateIframeOptions {
 - `navigationCallBack` (REQUIRED): This is used to navigate between pages on the hosting site, from class listings to the page that embeds the video of the class. It is passed the `navigationAction` (`"learn" | "fitness" | "joinClass" | "login" | "home" | "help"`) and if the `navigationAction` is `"joinClass"` is is also passed the `sessionId` and `classSlug` of the class the user wants to join. The hosting site should deal with these navigation requests as appropriate.
 - `tokenRequestCallBack` (OPTIONAL): This callback is used to get a token from the hosting page. This token is used for chat authorization, so this callback is optional if you have disabled chat, otherwise this callback is required. This callback is called when the iframe loads or the current token expires. The callback must return An encrypted JWT (JWE) that was encrypted with the public key given to you by GetSetUp. That token maybe returned as a pain string, or as a string inside a promise if your token generation is async. If no token is available (E.g. the user is not logged into your site) you may return `null`, `undefined`, nothing (`void`) or a promise that resolves to any of those. Details on constructing the token are below in the [Token](#token) section.
 - `statusCallBack` (OPTIONAL): This callback is called when the iframe is loading, has loaded, or errors. The object that is passed to this function has a `status` and a `message`. Both of those fields are for intended to inform developers what the iframe is doing, they SHOULD NOT be shown to users.
-- `linkTemplates.joinClass` (OPTIONAL): A URL template that will be used to construct links from the embedded browse pages (learn, fitness) to the page that embeds the join class page. This is an optional convenience offered to premium partners, it doesn't effect the navigation between pages which is still handled by the `navigationCallBack`. Rather it provides link that bots can crawl to aid with SEO. See the [link templates section](#link-templates) for more information. `linkTemplates` is an object to allow for future expansion of this concept, but only the `joinClass` link template is currently supported.
+- `linkTemplates.joinClass` (OPTIONAL): A URL template that will be used to construct links from the embedded browse pages (learn, fitness) to the page that embeds the join class page. This is an optional convenience offered to premium partners, it doesn't effect the navigation between pages which is still handled by the `navigationCallBack`. Rather it provides a link that bots can crawl to aid with SEO. See the [link templates section](#link-templates) for more information. `linkTemplates` is an object to allow for future expansion of this concept.
+- `linkTemplates.learnPage` (OPTIONAL): A URL template that will be used to construct links from one embedded browse pages (ex. fitness) to the learn page. This is an optional convenience offered to premium partners, it doesn't effect the navigation between pages which is still handled by the `navigationCallBack`. Rather it provides a link that bots can crawl to aid with SEO. See the [link templates section](#link-templates) for more information.
+- `linkTemplates.fitnessPage` (OPTIONAL): A URL template that will be used to construct links from one embedded browse pages (ex. learn) to the fitness page. This is an optional convenience offered to premium partners, it doesn't effect the navigation between pages which is still handled by the `navigationCallBack`. Rather it provides a link that bots can crawl to aid with SEO. See the [link templates section](#link-templates) for more information.
 - `targetUrls` (OPTIONAL): Allow the caller to override the the urls of the pages to be embedded. Used for testing, this should not be required in production. Is an object of the form :
 ```js
 {
@@ -260,7 +272,7 @@ const token = new jose.EncryptJWT({})
 
 ### Link Template
 
-> `linkTemplates` is an object to allow for future expansion of this concept, but only the `joinClass` link template is currently supported.
+> `linkTemplates` is an object to allow for future expansion of this concept, but only the `joinClass`,  `learnPage`, and `fitnessPage` link templates are currently supported.
 
 The Link Template is an optional URL template passed into the `GSU.createIframe` function as a string. If present in the string, the tokens `{classSlug}` and `{sessionId}` are replaced with their values.
 
