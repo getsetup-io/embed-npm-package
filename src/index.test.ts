@@ -811,7 +811,7 @@ describe('GSU Embedded Shell', () => {
       navigationCallBack: mockNavCallback,
       embeddingOrgId: 'AOL',
       tokenRequestCallBack: mockTokenCallback,
-      linkTemplates: {joinClass: 'link-template-join-class', navigationPath: '/fitness'},
+      linkTemplates: {joinClass: 'link-template-join-class', fitnessPage: '/fitness', learnPage: '/learn'},
     })
 
     const gsuTargetChildren = queryByAttribute('id', document.body, 'gsuTarget')?.children

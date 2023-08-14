@@ -94,10 +94,15 @@ export interface CreateIframeOptions {
      */
     joinClass?: string
     /**
-     * This template should be the URL path you wish the browse pages to link to on your site.
-     * For example: `/fitness` or `/learn`.
+     * This template should be the URL path of the learn page on your site.
+     * For example: `/learn`.
      */
-    navigationPath?: string
+    learnPage?: string
+    /**
+     * This template should be the URL path of the fitness page on your site.
+     * For example: `/fitness`.
+     */
+    fitnessPage?: string
   }
 
   /** Optional - Allows the caller to override urls that will be loaded in the iframe. Used for testing. */
@@ -214,7 +219,10 @@ export function createIframe({
   if (linkTemplates?.joinClass) iframeSrc.searchParams.append('link-template-join-class', linkTemplates?.joinClass)
 
   // Pass the navigation path link template to allow the page to construct hosting site links for SEO.
-  if (linkTemplates?.navigationPath) iframeSrc.searchParams.append('link-template-navigation-path', linkTemplates?.navigationPath)
+  if (linkTemplates?.learnPage) iframeSrc.searchParams.append('link-template-navigation-path', linkTemplates?.learnPage)
+
+  // Pass the navigation path link template to allow the page to construct hosting site links for SEO.
+  if (linkTemplates?.fitnessPage) iframeSrc.searchParams.append('link-template-navigation-path', linkTemplates?.fitnessPage)
 
   const tellHostingPageIframeStatus = errorReporter({
     statusCallBack,
