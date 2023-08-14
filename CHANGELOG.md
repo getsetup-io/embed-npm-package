@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `linkTemplates.navigationPath`: An option to pass in a URL template that will be used to construct links from one browse page to another.
+- `linkTemplates.learnPage`: An option to pass in a URL template that will be used to construct links from one browse page to the learn page.
+
+- `linkTemplates.fitnessPage`: An option to pass in a URL template that will be used to construct links from one browse page to fitness page.
 
 ## [1.5.0] - 2023-07-26
 
