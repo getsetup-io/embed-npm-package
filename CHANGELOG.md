@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `linkTemplates.fitnessPage`: An option to pass in a URL template that will be used to construct links from one browse page to fitness page.
 
+- Set new sandbox attribute `allow-popups`: Allows popups (like from Window.open(), target="_blank", Window.showModalDialog()). If this keyword is not used, that functionality will silently fail.
+
 ## [1.5.0] - 2023-07-26
 
 ### Added
