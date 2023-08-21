@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.6.0] - 2023-08-08
+## [1.6.0] - 2023-08-21
 
 ### Added
 
@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `linkTemplates.fitnessPage`: An option to pass in a URL template that will be used to construct links from one browse page to fitness page.
 
-- Set new sandbox attribute `allow-popups`: Allows popups (like from Window.open(), target="_blank", Window.showModalDialog()). If this keyword is not used, that functionality will silently fail.
+- New sandbox attribute `allow-popups`: Allows popups (like from Window.open(), target="_blank", Window.showModalDialog()). This has been added to enable the 'add to calendar' functionality, which allows a user to open a new web page to book an upcoming class using their preferred calendar service.
 
 ## [1.5.0] - 2023-07-26
 
