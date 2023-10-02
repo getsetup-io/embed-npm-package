@@ -110,7 +110,7 @@ export interface CreateIframeOptions {
   }
 
   /** Optional - Allows the caller to override urls that will be loaded in the iframe. Used for testing. */
-  targetUrls?: typeof targetPageUrls
+  targetUrls?: Partial<typeof targetPageUrls>
 
   /**
    * Optional - Allows the caller to override the loading timeout that displays an error message if the iframe doesn't load in time.
@@ -191,7 +191,7 @@ export function createIframe({
     throw new Error('The targetPage should be one of "learn" | "fitness" | "joinClass" | "discover" | "class".')
   }
 
-  const targetPages = targetUrls ?? targetPageUrls
+  const targetPages = { ...targetPageUrls, ...targetUrls }
   const normalisedOrgId = embeddingOrgId.toLowerCase()
   targetPages.learn = targetPages.learn.replace('{embeddingOrgId}', normalisedOrgId)
   targetPages.fitness = targetPages.fitness.replace('{embeddingOrgId}', normalisedOrgId)
