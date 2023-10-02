@@ -196,8 +196,10 @@ export function createIframe({
   targetPages.learn = targetPages.learn.replace('{embeddingOrgId}', normalisedOrgId)
   targetPages.fitness = targetPages.fitness.replace('{embeddingOrgId}', normalisedOrgId)
   targetPages.joinClass = targetPages.joinClass.replace('{embeddingOrgId}', normalisedOrgId)
-  targetPages.class = targetPages.joinClass.replace('{embeddingOrgId}', normalisedOrgId)
-  targetPages.discover = targetPages.joinClass.replace('{embeddingOrgId}', normalisedOrgId)
+  targetPages.class = targetPages.class
+    .replace('{embeddingOrgId}', normalisedOrgId)
+    .replace('{classTitle}', classSlug ?? '')
+  targetPages.discover = targetPages.discover.replace('{embeddingOrgId}', normalisedOrgId)
   if (sessionId) {
     targetPages.joinClass = targetPages.joinClass.replace('{sessionId}', sessionId)
   }
@@ -273,15 +275,19 @@ export function createIframe({
   const loadingTimeout = setTimeout(handleTimeout, loadingTimeoutThreshold)
 
   // Try to load the head so we know if the page is working.
-
-  fetch(iframeSrc, { method: 'HEAD', mode: 'cors' })
-    .then((response) => {
-      if (!response.ok) handleNotLoading('HEAD Response was not ok.')
-    })
-    .catch((error) => {
-      const errorMessage = error.message ?? error
-      handleNotLoading(`HEAD Response errored. ${errorMessage}`)
-    })
+  if (targetPage === 'class' || targetPage === 'discover') {
+    //Skip the pre-check and loading check because the strapi backend doesn't support it.
+    hasLoadedSuccessfully = true
+  } else {
+    fetch(iframeSrc, { method: 'HEAD', mode: 'cors' })
+      .then((response) => {
+        if (!response.ok) handleNotLoading('HEAD Response was not ok.')
+      })
+      .catch((error) => {
+        const errorMessage = error.message ?? error
+        handleNotLoading(`HEAD Response errored. ${errorMessage}`)
+      })
+  }
 
   // See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox for info about sandboxing iframes.
   // We need:
