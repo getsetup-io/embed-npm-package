@@ -8,7 +8,7 @@ const targetPageUrls = {
   learn: 'https://embed.getsetup.io/embedded/{embeddingOrgId}/learn',
   fitness: 'https://embed.getsetup.io/embedded/{embeddingOrgId}/fitness',
   joinClass: 'https://lobby-embed.getsetup.io/session/{sessionId}',
-  discover: 'http://embed.getsetuplive.com/{embeddingOrgId}',
+  discover: 'https://embed.getsetuplive.com/{embeddingOrgId}',
   class: 'https://embed.getsetuplive.com/class/{embeddingOrgId}/?classTitle={classTitle}',
 }
 
