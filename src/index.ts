@@ -8,6 +8,8 @@ const targetPageUrls = {
   learn: 'https://embed.getsetup.io/embedded/{embeddingOrgId}/learn',
   fitness: 'https://embed.getsetup.io/embedded/{embeddingOrgId}/fitness',
   joinClass: 'https://lobby-embed.getsetup.io/session/{sessionId}',
+  discover: 'http://embed.getsetuplive.com/{embeddingOrgId}',
+  class: 'https://embed.getsetuplive.com/class/{embeddingOrgId}/?classTitle={classTitle}',
 }
 
 const navigationActions = {
@@ -43,6 +45,8 @@ export interface CreateIframeOptions {
 
   /** The id of the class session to play. Required if the `targetPage` is `joinClass`. */
   sessionId?: string
+
+  classSlug?: string
 
   /** The id of your organisation as issued to you by GetSetUp. */
   embeddingOrgId: string
@@ -173,12 +177,18 @@ export function createIframe({
   loadingTimeoutInMs,
   themeOptions,
   analyticsInfo,
+  classSlug,
 }: CreateIframeOptions): IframeInstance {
   if (targetPage == 'joinClass' && !sessionId) {
     throw new Error('sessionId is required if you are loading a join class page.')
   }
+
+  if (targetPage == 'class' && !classSlug) {
+    throw new Error('classSlug is required if you are loading a class page.')
+  }
+
   if (!Object.keys(targetPageUrls).includes(targetPage)) {
-    throw new Error('The targetPage should be one of "learn" | "fitness" | "joinClass".')
+    throw new Error('The targetPage should be one of "learn" | "fitness" | "joinClass" | "discover" | "class".')
   }
 
   const targetPages = targetUrls ?? targetPageUrls
@@ -186,6 +196,8 @@ export function createIframe({
   targetPages.learn = targetPages.learn.replace('{embeddingOrgId}', normalisedOrgId)
   targetPages.fitness = targetPages.fitness.replace('{embeddingOrgId}', normalisedOrgId)
   targetPages.joinClass = targetPages.joinClass.replace('{embeddingOrgId}', normalisedOrgId)
+  targetPages.class = targetPages.joinClass.replace('{embeddingOrgId}', normalisedOrgId)
+  targetPages.discover = targetPages.joinClass.replace('{embeddingOrgId}', normalisedOrgId)
   if (sessionId) {
     targetPages.joinClass = targetPages.joinClass.replace('{sessionId}', sessionId)
   }
