@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2023-10-02
+
+### Added
+
+- Experimental support for a different back end powering the embed experience.
+
 ## [1.6.0] - 2023-08-21
 
 ### Added
@@ -101,7 +107,7 @@ This means that the size of the joinClass iframe can be controlled by the elemen
 
 ### Fixed
 
-- The createIframe function now supports a fallback for browsers that don't support replaceChildren. See: https://caniuse.com/?search=replaceChildren.
+- The createIframe function now supports a fallback for browsers that don't support replaceChildren. See: <https://caniuse.com/?search=replaceChildren>.
 
 ## [1.0.1] - 2023-02-28
 
