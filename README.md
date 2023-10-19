@@ -209,7 +209,6 @@ The iframe is created with the following styles attached:
 border: 'none';
 width: 100%;
 height: 100%;
-min-height: 300px;
 ```
 
 #### Browse Pages
