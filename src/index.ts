@@ -302,7 +302,6 @@ export function createIframe({
   gsuEmbeddedIframe.style.width = '100%'
   gsuEmbeddedIframe.style.border = 'none'
   gsuEmbeddedIframe.style.height = '100%'
-  gsuEmbeddedIframe.style.minHeight = '300px'
 
   if (targetElement.replaceChildren) {
     targetElement.replaceChildren(gsuEmbeddedIframe)

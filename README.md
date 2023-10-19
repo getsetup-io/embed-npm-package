@@ -40,7 +40,6 @@ createIframe({
 })
 ```
 
-
 ## Using The Package
 The package exposes one function: `GSU.createIframe(options)`. This function will create an iframe in the host page and create the event listeners needed for `postMessage` communication with the iframe.
 
@@ -195,21 +194,20 @@ export interface CreateIframeOptions {
 
 #### Navigation Actions
 The `navigationCallBack` is passed a `navigationAction` argument that is one of the following strings:
-* `"learn"`: This indicates that the user wants to navigate to the page where you have embedded the GetSetUp _Learn_ page. For example the user clicked the back button on the _Join Class_ page.
-* `"fitness"`: This indicates that the user wants to navigate to the page where you have embedded the GetSetUp _Fitness_ page. For example the user clicked the back button on the _Join Class_ page.
-* `"joinClass"`: This indicates that the user wants to navigate to the page where you have embedded the GetSetUp _Join Class_ page. This happens when the user clicks a class listing on the _Learn_ or _Fitness_ pages, or if the user clicks a recommended class in the explore panel on the _Join Class_ page. In this case the `navigationCallBack` will also be passed a `sessionId` that you MUST pass back to the createIframe function to ensure the class is loaded for the user, as well as a `classSlug` that you MAY use to construct a pretty URL on the page embedding the _Join Class_.
-* `"login"`: This indicates that the user wants to use the embedded chat experience on the _Join Class_ and that the parent page has not already provided a token to use. You should navigate the user to your login experience and redirect them to the page they are currently on once they are authenticated.
-* `"home"`: This indicates that the user wants to navigate to the home page of the parent site. You should navigate the user as appropriate.
-* `"help"`: This indicates that the user needs help. This is handled by the parent site as appropriate. You should navigate the user to your help pages, or show a dialog over the iframe, or any other response to a help request that makes sense for your site.
+- `"learn"`: This indicates that the user wants to navigate to the page where you have embedded the GetSetUp _Learn_ page. For example the user clicked the back button on the _Join Class_ page.
+- `"fitness"`: This indicates that the user wants to navigate to the page where you have embedded the GetSetUp _Fitness_ page. For example the user clicked the back button on the _Join Class_ page.
+- `"joinClass"`: This indicates that the user wants to navigate to the page where you have embedded the GetSetUp _Join Class_ page. This happens when the user clicks a class listing on the _Learn_ or _Fitness_ pages, or if the user clicks a recommended class in the explore panel on the _Join Class_ page. In this case the `navigationCallBack` will also be passed a `sessionId` that you MUST pass back to the createIframe function to ensure the class is loaded for the user, as well as a `classSlug` that you MAY use to construct a pretty URL on the page embedding the _Join Class_.
+- `"login"`: This indicates that the user wants to use the embedded chat experience on the _Join Class_ and that the parent page has not already provided a token to use. You should navigate the user to your login experience and redirect them to the page they are currently on once they are authenticated.
+- `"home"`: This indicates that the user wants to navigate to the home page of the parent site. You should navigate the user as appropriate.
+- `"help"`: This indicates that the user needs help. This is handled by the parent site as appropriate. You should navigate the user to your help pages, or show a dialog over the iframe, or any other response to a help request that makes sense for your site.
 
 ### Page Layout
-
 The iframe is created with the following styles attached:
+
 ```css
 border: 'none';
 width: 100%;
 height: 100%;
-min-height: 300px;
 ```
 
 #### Browse Pages
@@ -232,6 +230,7 @@ overflow: hidden;
 width: 100%;
 height: calc(100vh - 300px);
 ```
+
 That would allow space for 150px high elements at the top and bottom of the page.
 
 The Join Class iframe should support most width/height values on the containing element, but we do not recommend values smaller than (600px, 300px) or (300px, 600px).
@@ -240,14 +239,14 @@ The Join Class iframe should support most width/height values on the containing 
 The token you supply to the `tokenRequestCallBack()` function must be a JSON Web Encryption (JWE) token. GetSetUp will provide you with a public key, as a JSON Web Key (JWK), that you will use to encrypt the token.
 
 The token should be encrypted with the following settings:
-* alg: `RSA-OAEP-256`
-* enc: `A256GCM`
+- alg: `RSA-OAEP-256`
+- enc: `A256GCM`
 
 The payload of the token must contain:
-* sub: The subject of the token. This should be a stable user id that you can understand if it is sent back to you in analytics reporting.
-* iss: The issuer of the token. This must be the `embeddingOrgId` as issued to you by GetSetUp.
-* aud: The audience for the token. This must be the string `getsetup`.
-* exp: The timestamp at which this token is no longer valid. This is a JSON numeric value representing the number of seconds from 1970-01-01T00:00:00Z UTC. See [exp in RFC7519](https://www.rfc-editor.org/rfc/rfc7519#section-4.1.4) and the [NumericDate format in the same RFC](https://www.rfc-editor.org/rfc/rfc7519#section-2)
+- sub: The subject of the token. This should be a stable user id that you can understand if it is sent back to you in analytics reporting.
+- iss: The issuer of the token. This must be the `embeddingOrgId` as issued to you by GetSetUp.
+- aud: The audience for the token. This must be the string `getsetup`.
+- exp: The timestamp at which this token is no longer valid. This is a JSON numeric value representing the number of seconds from 1970-01-01T00:00:00Z UTC. See [exp in RFC7519](https://www.rfc-editor.org/rfc/rfc7519#section-4.1.4) and the [NumericDate format in the same RFC](https://www.rfc-editor.org/rfc/rfc7519#section-2)
 
 #### Token refresh
 The GetSetUp chat experience will use the token expiry time (`exp`) to determine when to check for a new token. The chat experience will ask the parent page for a new token using the `tokenRequestCallBack` 30 seconds before the token will expire. If the chat experience receives a token that is not valid it will continue to use the existing valid token it has until it expires.
@@ -255,7 +254,6 @@ The GetSetUp chat experience will use the token expiry time (`exp`) to determine
 The chat experience places a floor on the minimum length of time a token can be valid for. If the token is valid for less than one minute, the chat experience will treat the token as being valid for one minute. This is to prevent misconfiguration from DOSing GetSetup or, via the `tokenRequestCallBack`, the parent page with tokens that immediately expire.
 
 When the token expires the user will be logged out of the chat experience and will have to click a button to initiate the login flow again. The chat experience will not automatically retry to get a valid token after receiving an invalid token.
-
 
 An example of encrypting a token with the [jose npm package](https://www.npmjs.com/package/jose):
 ```ts
@@ -270,8 +268,7 @@ const token = new jose.EncryptJWT({})
           .encrypt(publicKey);
 ```
 
-### Link Template
-
+### Link Templates
 > `linkTemplates` is an object to allow for future expansion of this concept, but only the `joinClass`,  `learnPage`, and `fitnessPage` link templates are currently supported.
 
 The Link Template is an optional URL template passed into the `GSU.createIframe` function as a string. If present in the string, the tokens `{classSlug}` and `{sessionId}` are replaced with their values.
@@ -283,14 +280,12 @@ As an example, imagine the site example.com is embedded GetSetUp into it's pages
 If example.com used query strings to route between embedded pages then their URLs might look like this: `example.com/watch?session-id=wdf80h32b` in which case their `linkTemplate` should be: `example.com/watch?session-id={sessionId}`.
 
 Please note:
-  * There is no sanity checking preformed on the Link Template, it is 100% under the control of the integrating partner.
-  * If you require different URLs on different pages, then you can provide different `linkTemplate`s on those pages.
-  * Only the tokens `{classSlug}` and `{sessionId}` are supported in `linkTemplate`s. Anything else will be left unchanged.
+- There is no sanity checking preformed on the Link Template, it is 100% under the control of the integrating partner.
+- If you require different URLs on different pages, then you can provide different `linkTemplate`s on those pages.
+- Only the tokens `{classSlug}` and `{sessionId}` are supported in `linkTemplate`s. Anything else will be left unchanged.
 
 ### Clean Up
-
 The `GSU.createIframe` function returns a `GSU.IframeInstance` object that has the following interface:
-
 ```TypeScript
 export interface IframeInstance {
   cleanUp: () => void
