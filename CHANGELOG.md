@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2023-12-06
+
+### Removed
+
+- Removed the min-height set on the iframe element.
+
+### Added
+
+- `allow-downloads` permission to the iframe sandbox attribute. This allows users to download attachments from class notes.
+
 ## [1.7.0] - 2023-10-02
 
 ### Added
