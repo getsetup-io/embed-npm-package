@@ -133,6 +133,13 @@ export interface CreateIframeOptions {
     domain?: string
     /** A stable id for the device the user is using to access the parent page. */
     deviceId?: string
+    /** A stable id for the user account that is accessing the parent page. */
+    userId?: string
+    /**
+     * An arbitrary string of data about the user that you want send back to you for analytics.
+     * For example a cost center for that user, or some sort of billing code.
+     */
+    userSegment?: string
   }
 }
 
@@ -227,6 +234,9 @@ export function createIframe({
     // This will override the previous device-id above, but that's what we want.
     // The other device-id method is deprecated, both of these should be removed in a future version.
     if (analyticsInfo.deviceId) iframeSrc.searchParams.set('device-id', analyticsInfo.deviceId)
+
+    // We add the user segment into the query string separately so we can use it as a cache key if we need to.
+    if (analyticsInfo.userSegment) iframeSrc.searchParams.set('user-segment', analyticsInfo.userSegment)
   }
 
   // Pass the join class link template to allow the page to construct hosting site links for SEO.
