@@ -133,6 +133,13 @@ export interface CreateIframeOptions {
     domain?: string
     /** A stable id for the device the user is using to access the parent page. */
     deviceId?: string
+    /** A stable id for the user account that is accessing the parent page. */
+    userId?: string
+    /**
+     * An arbitrary string of data about the user that you want send back to you for analytics.
+     * For example a cost center for that user, or some sort of billing code.
+     */
+    userData?: string
   }
 }
 
