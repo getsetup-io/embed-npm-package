@@ -293,8 +293,9 @@ export function createIframe({
   // We need:
   // * allow-scripts - so our js runs.
   // * allow-same-origin - otherwise our postMessage messages do not have an origin attached, and we would like to check the origin of messages.
-  // * allow-popups - to allow links with target _blank attribute to work
-  gsuEmbeddedIframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups')
+  // * allow-popups - to allow links with target _blank attribute to work.
+  // * allow-downloads - so users can download the attachments that might be included with some class notes.
+  gsuEmbeddedIframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-downloads')
   gsuEmbeddedIframe.setAttribute('allow', 'fullscreen; autoplay;')
   gsuEmbeddedIframe.setAttribute('allowfullscreen', '') // To support Firefox and Safari.
   gsuEmbeddedIframe.setAttribute('scrolling', 'no')
