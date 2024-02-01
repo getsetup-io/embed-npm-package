@@ -8,8 +8,9 @@ const targetPageUrls = {
   learn: 'https://embed.getsetup.io/embedded/{embeddingOrgId}/learn',
   fitness: 'https://embed.getsetup.io/embedded/{embeddingOrgId}/fitness',
   joinClass: 'https://lobby-embed.getsetup.io/session/{sessionId}',
-  discover: 'https://embed.getsetuplive.com/{embeddingOrgId}',
-  class: 'https://embed.getsetuplive.com/class/{embeddingOrgId}/?classTitle={classTitle}',
+  // The below will be updated to final URLs later.
+  discover: 'https://embed.getsetup.io/embedded/generic/discover/?partner-id={embeddingOrgId}',
+  watch: 'https://lobby-embed.getsetup.io/session/{sessionId}',
 }
 
 const navigationActions = {
@@ -134,6 +135,7 @@ export interface CreateIframeOptions {
     /** A stable id for the device the user is using to access the parent page. */
     deviceId?: string
   }
+  pageId?: string
 }
 
 export interface IframeInstance {
@@ -178,17 +180,14 @@ export function createIframe({
   themeOptions,
   analyticsInfo,
   classSlug,
+  pageId,
 }: CreateIframeOptions): IframeInstance {
   if (targetPage == 'joinClass' && !sessionId) {
     throw new Error('sessionId is required if you are loading a join class page.')
   }
 
-  if (targetPage == 'class' && !classSlug) {
-    throw new Error('classSlug is required if you are loading a class page.')
-  }
-
   if (!Object.keys(targetPageUrls).includes(targetPage)) {
-    throw new Error('The targetPage should be one of "learn" | "fitness" | "joinClass" | "discover" | "class".')
+    throw new Error('The targetPage should be one of "learn" | "fitness" | "joinClass" | "discover" | "watch".')
   }
 
   const targetPages = { ...targetPageUrls, ...targetUrls }
@@ -196,7 +195,7 @@ export function createIframe({
   targetPages.learn = targetPages.learn.replace('{embeddingOrgId}', normalisedOrgId)
   targetPages.fitness = targetPages.fitness.replace('{embeddingOrgId}', normalisedOrgId)
   targetPages.joinClass = targetPages.joinClass.replace('{embeddingOrgId}', normalisedOrgId)
-  targetPages.class = targetPages.class
+  targetPages.watch = targetPages.watch
     .replace('{embeddingOrgId}', normalisedOrgId)
     .replace('{classTitle}', classSlug ?? '')
   targetPages.discover = targetPages.discover.replace('{embeddingOrgId}', normalisedOrgId)
@@ -238,6 +237,8 @@ export function createIframe({
   // Pass the navigation path link template to allow the page to construct hosting site links for SEO.
   if (linkTemplates?.fitnessPage)
     iframeSrc.searchParams.append('link-template-navigation-path', linkTemplates?.fitnessPage)
+
+  if (pageId) iframeSrc.searchParams.append('page-id', pageId)
 
   // Pass the list of permissions into the iframe.
   // This list has changed over time and partners can't update this package instantly.
@@ -281,8 +282,9 @@ export function createIframe({
   const loadingTimeout = setTimeout(handleTimeout, loadingTimeoutThreshold)
 
   // Try to load the head so we know if the page is working.
-  if (targetPage === 'class' || targetPage === 'discover') {
-    //Skip the pre-check and loading check because the strapi backend doesn't support it.
+  if (targetPage === 'watch' || targetPage === 'discover') {
+    // TODO: do we want to support this for the new webapp, or just try to load the page.
+    // Maybe kill the backed in error page.
     hasLoadedSuccessfully = true
   } else {
     fetch(iframeSrc, { method: 'HEAD', mode: 'cors' })
