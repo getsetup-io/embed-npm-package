@@ -50,7 +50,10 @@ export interface CreateIframeOptions {
   classSlug?: string
 
   /** The id of your organisation as issued to you by GetSetUp. */
-  embeddingOrgId: string
+  embeddingOrgId?: string
+
+  /** The id of your organisation as issued to you by GetSetUp. */
+  partnerId?: string
 
   /**
    * A stable id for the device the user is using to access the parent page. Used to report analytics back to your organisation.
@@ -168,6 +171,7 @@ export function createIframe({
   targetPage,
   sessionId,
   embeddingOrgId,
+  partnerId,
   deviceId,
   disableChat,
   disableHelp,
@@ -190,17 +194,29 @@ export function createIframe({
     throw new Error('The targetPage should be one of "learn" | "fitness" | "joinClass" | "discover" | "watch".')
   }
 
+  let normalisedOrgId = ''
+  if (partnerId) {
+    normalisedOrgId = partnerId.toLowerCase()
+  } else if (embeddingOrgId) {
+    normalisedOrgId = embeddingOrgId.toLowerCase()
+  } else {
+    throw new Error('Either embeddingOrgId or partnerId is required.')
+  }
+
   const targetPages = { ...targetPageUrls, ...targetUrls }
-  const normalisedOrgId = embeddingOrgId.toLowerCase()
+
   targetPages.learn = targetPages.learn.replace('{embeddingOrgId}', normalisedOrgId)
   targetPages.fitness = targetPages.fitness.replace('{embeddingOrgId}', normalisedOrgId)
   targetPages.joinClass = targetPages.joinClass.replace('{embeddingOrgId}', normalisedOrgId)
   targetPages.watch = targetPages.watch
     .replace('{embeddingOrgId}', normalisedOrgId)
-    .replace('{classTitle}', classSlug ?? '')
-  targetPages.discover = targetPages.discover.replace('{embeddingOrgId}', normalisedOrgId)
+    .replace('{partnerId}', normalisedOrgId)
+  targetPages.discover = targetPages.discover
+    .replace('{embeddingOrgId}', normalisedOrgId)
+    .replace('{partnerId}', normalisedOrgId)
   if (sessionId) {
     targetPages.joinClass = targetPages.joinClass.replace('{sessionId}', sessionId)
+    targetPages.watch = targetPages.watch.replace('{sessionId}', sessionId)
   }
 
   const targetElement = document.getElementById(targetElementId)
