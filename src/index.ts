@@ -196,7 +196,6 @@ export function createIframe({
   loadingTimeoutInMs,
   themeOptions,
   analyticsInfo,
-  classSlug,
   pageId,
 }: CreateIframeOptions): IframeInstance {
   if (targetPage == 'joinClass' && !sessionId) {
