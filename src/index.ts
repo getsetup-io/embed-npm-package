@@ -47,8 +47,6 @@ export interface CreateIframeOptions {
   /** The id of the class session to play. Required if the `targetPage` is `joinClass`. */
   sessionId?: string
 
-  classSlug?: string
-
   /** The id of your organisation as issued to you by GetSetUp. */
   embeddingOrgId?: string
 
@@ -183,7 +181,6 @@ export function createIframe({
   loadingTimeoutInMs,
   themeOptions,
   analyticsInfo,
-  classSlug,
   pageId,
 }: CreateIframeOptions): IframeInstance {
   if (targetPage == 'joinClass' && !sessionId) {
