@@ -9,7 +9,7 @@ const targetPageUrls = {
   fitness: 'https://embed.getsetup.io/embedded/{embeddingOrgId}/fitness',
   joinClass: 'https://lobby-embed.getsetup.io/session/{sessionId}',
   // The below will be updated to final URLs later.
-  discover: 'https://embed.getsetup.io/embedded/generic/discover/?partner-id={embeddingOrgId}',
+  discover: 'https://embed.getsetup.io/embedded/generic/discover/?partner-code={embeddingOrgId}',
   watch: 'https://lobby-embed.getsetup.io/session/{sessionId}',
 }
 
@@ -51,7 +51,7 @@ export interface CreateIframeOptions {
   embeddingOrgId?: string
 
   /** The id of your organisation as issued to you by GetSetUp. */
-  partnerId?: string
+  partnerCode?: string
 
   /**
    * A stable id for the device the user is using to access the parent page. Used to report analytics back to your organisation.
@@ -169,7 +169,7 @@ export function createIframe({
   targetPage,
   sessionId,
   embeddingOrgId,
-  partnerId,
+  partnerCode,
   deviceId,
   disableChat,
   disableHelp,
@@ -192,12 +192,13 @@ export function createIframe({
   }
 
   let normalisedOrgId = ''
-  if (partnerId) {
-    normalisedOrgId = partnerId.toLowerCase()
+  if (partnerCode) {
+    // We don't want to transform the partner code. It is case sensitive.
+    normalisedOrgId = partnerCode
   } else if (embeddingOrgId) {
     normalisedOrgId = embeddingOrgId.toLowerCase()
   } else {
-    throw new Error('Either embeddingOrgId or partnerId is required.')
+    throw new Error('Either embeddingOrgId or partnerCode is required.')
   }
 
   const targetPages = { ...targetPageUrls, ...targetUrls }
@@ -207,10 +208,10 @@ export function createIframe({
   targetPages.joinClass = targetPages.joinClass.replace('{embeddingOrgId}', normalisedOrgId)
   targetPages.watch = targetPages.watch
     .replace('{embeddingOrgId}', normalisedOrgId)
-    .replace('{partnerId}', normalisedOrgId)
+    .replace('{partnerCode}', normalisedOrgId)
   targetPages.discover = targetPages.discover
     .replace('{embeddingOrgId}', normalisedOrgId)
-    .replace('{partnerId}', normalisedOrgId)
+    .replace('{partnerCode}', normalisedOrgId)
   if (sessionId) {
     targetPages.joinClass = targetPages.joinClass.replace('{sessionId}', sessionId)
     targetPages.watch = targetPages.watch.replace('{sessionId}', sessionId)
