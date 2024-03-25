@@ -9,8 +9,8 @@ const targetPageUrls = {
   fitness: 'https://embed.getsetup.io/embedded/{embeddingOrgId}/fitness',
   joinClass: 'https://lobby-embed.getsetup.io/session/{sessionId}',
   // The below will be updated to final URLs later.
-  discover: 'https://embed-webapp.www.getsetup.io/embedded/generic/discover/?partner-code={embeddingOrgId}',
-  watch: 'https://embed-webapp.www.getsetup.io/session/{sessionId}',
+  discover: 'https://embed-webapp.www.getsetup.io/discovery{partnerId}',
+  watch: 'https://embed-webapp.www.getsetup.io/watch/{classId}',
 }
 
 const navigationActions = {
