@@ -337,7 +337,12 @@ describe('GSU Embedded Shell', () => {
         origin: 'https://embed.getsetup.io',
       }),
     )
-    expect(navFunction).toBeCalledWith('learn', undefined, undefined)
+    expect(navFunction).toBeCalledWith({
+      classId: undefined,
+      classSlug: undefined,
+      navigationAction: 'learn',
+      sessionId: undefined,
+    })
   })
 
   test('calls the navigation call back with sessionId and classSlug when sent a message to navigate to the joinClass page', () => {
@@ -363,7 +368,43 @@ describe('GSU Embedded Shell', () => {
         origin: 'https://embed.getsetup.io',
       }),
     )
-    expect(navFunction).toBeCalledWith('joinClass', 'a-valid-session-id', '-some-class-slug-')
+    expect(navFunction).toBeCalledWith({
+      classId: undefined,
+      classSlug: '-some-class-slug-',
+      navigationAction: 'joinClass',
+      sessionId: 'a-valid-session-id',
+    })
+  })
+
+  test('calls the navigation call back with classId sent a message to navigate to the watch page', () => {
+    document.body.innerHTML = '<div id="gsuTarget"></div>'
+
+    const navFunction = jest.fn()
+
+    createIframe({
+      targetElementId: 'gsuTarget',
+      targetPage: 'discover',
+      navigationCallBack: navFunction,
+      embeddingOrgId: 'AOL',
+      tokenRequestCallBack: mockTokenCallback,
+    })
+
+    // Use fire event to simulate window.postMessage()
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          gsuNavigation: { targetPage: 'watch', classId: 'someClassId' },
+        },
+        origin: 'https://embed.getsetup.io',
+      }),
+    )
+    expect(navFunction).toBeCalledWith({
+      classId: 'someClassId',
+      classSlug: undefined,
+      navigationAction: 'watch',
+      sessionId: undefined,
+    })
   })
 
   test('does not call the navigation call back when sent a message with an invalid targetPage', () => {
@@ -811,7 +852,7 @@ describe('GSU Embedded Shell', () => {
       navigationCallBack: mockNavCallback,
       embeddingOrgId: 'AOL',
       tokenRequestCallBack: mockTokenCallback,
-      linkTemplates: {joinClass: 'link-template-join-class', fitnessPage: '/fitness', learnPage: '/learn'},
+      linkTemplates: { joinClass: 'link-template-join-class', fitnessPage: '/fitness', learnPage: '/learn' },
     })
 
     const gsuTargetChildren = queryByAttribute('id', document.body, 'gsuTarget')?.children
@@ -823,6 +864,5 @@ describe('GSU Embedded Shell', () => {
 
     expect(gsuIframe).toHaveAttribute('src', expect.stringContaining(`/fitness`))
     expect(gsuIframe).toHaveAttribute('src', expect.stringContaining(`link-template-join-class`))
-
   })
 })

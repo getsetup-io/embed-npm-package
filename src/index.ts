@@ -8,8 +8,9 @@ const targetPageUrls = {
   learn: 'https://embed.getsetup.io/embedded/{embeddingOrgId}/learn',
   fitness: 'https://embed.getsetup.io/embedded/{embeddingOrgId}/fitness',
   joinClass: 'https://lobby-embed.getsetup.io/session/{sessionId}',
-  discover: 'https://embed.getsetuplive.com/{embeddingOrgId}',
-  class: 'https://embed.getsetuplive.com/class/{embeddingOrgId}/?classTitle={classTitle}',
+  // The below will be updated to final URLs later.
+  discover: 'https://embed-webapp.www.getsetup.io/discovery/{partnerId}',
+  watch: 'https://embed-webapp.www.getsetup.io/watch/{partnerId}/{classId}',
 }
 
 const navigationActions = {
@@ -46,10 +47,14 @@ export interface CreateIframeOptions {
   /** The id of the class session to play. Required if the `targetPage` is `joinClass`. */
   sessionId?: string
 
-  classSlug?: string
+  /** The id of the VOD class to play. Required if the `targetPage` is `watch`. */
+  classId?: string
 
   /** The id of your organisation as issued to you by GetSetUp. */
-  embeddingOrgId: string
+  embeddingOrgId?: string
+
+  /** The id of your organisation as issued to you by GetSetUp. */
+  partnerId?: string
 
   /**
    * A stable id for the device the user is using to access the parent page. Used to report analytics back to your organisation.
@@ -65,12 +70,22 @@ export interface CreateIframeOptions {
 
   /**
    * This function is called when the iframe needs to navigate the top level URL.
-   * E.G: to go from `hostsite.com/online-classes/catalogue` to `hostsite.com/online-classes/join-session/98hsfnb498ywh4`
+   * E.G: to go from `hostsite.com/online-classes/catalogue` to `hostsite.com/online-classes/watch-video/98hsfnb498ywh4`
    * @param navigationAction The page to navigate to. If this is `login` the parent page should start a login flow and redirect the user to the current page once they are logged in.
+   * @param classId If the page is the watch page, then classId must be passed back to the createIframe function on the new page.
    * @param sessionId If the page is the joinClass page, then sessionId must be passed back to the createIframe function on the new page.
    * @param classSlug If the page is the joinClass page, then the classSlug will be sent to this callback. The classSlug is only for SEO use on the parent page, it is not required to be passed back to the createIframe function.
    */
-  navigationCallBack: (navigationAction: NavigationAction, sessionId?: string, classSlug?: string) => void
+  navigationCallBack: ({
+    navigationAction,
+    sessionId,
+    classSlug,
+  }: {
+    navigationAction: NavigationAction
+    classId?: string
+    sessionId?: string
+    classSlug?: string
+  }) => void
 
   /**
    * This function is called when the iframe needs a token.
@@ -134,6 +149,7 @@ export interface CreateIframeOptions {
     /** A stable id for the device the user is using to access the parent page. */
     deviceId?: string
   }
+  pageId?: string
 }
 
 export interface IframeInstance {
@@ -149,6 +165,7 @@ interface EventFromIframe {
     gsuNavigation?: {
       targetPage?: any
       sessionId?: any
+      classId?: any
       classSlug?: any
     }
     gsuAnchorNavigation?: any
@@ -165,7 +182,9 @@ export function createIframe({
   targetElementId,
   targetPage,
   sessionId,
+  classId,
   embeddingOrgId,
+  partnerId,
   deviceId,
   disableChat,
   disableHelp,
@@ -177,31 +196,44 @@ export function createIframe({
   loadingTimeoutInMs,
   themeOptions,
   analyticsInfo,
-  classSlug,
+  pageId,
 }: CreateIframeOptions): IframeInstance {
   if (targetPage == 'joinClass' && !sessionId) {
     throw new Error('sessionId is required if you are loading a join class page.')
   }
 
-  if (targetPage == 'class' && !classSlug) {
-    throw new Error('classSlug is required if you are loading a class page.')
+  if (!Object.keys(targetPageUrls).includes(targetPage)) {
+    throw new Error('The targetPage should be one of "learn" | "fitness" | "joinClass" | "discover" | "watch".')
   }
 
-  if (!Object.keys(targetPageUrls).includes(targetPage)) {
-    throw new Error('The targetPage should be one of "learn" | "fitness" | "joinClass" | "discover" | "class".')
+  let normalisedOrgId = ''
+  if (partnerId) {
+    // We don't want to transform the partner code. It is case sensitive.
+    normalisedOrgId = partnerId
+  } else if (embeddingOrgId) {
+    normalisedOrgId = embeddingOrgId.toLowerCase()
+  } else {
+    throw new Error('Either embeddingOrgId or partnerId is required.')
   }
 
   const targetPages = { ...targetPageUrls, ...targetUrls }
-  const normalisedOrgId = embeddingOrgId.toLowerCase()
+
   targetPages.learn = targetPages.learn.replace('{embeddingOrgId}', normalisedOrgId)
   targetPages.fitness = targetPages.fitness.replace('{embeddingOrgId}', normalisedOrgId)
   targetPages.joinClass = targetPages.joinClass.replace('{embeddingOrgId}', normalisedOrgId)
-  targetPages.class = targetPages.class
+  targetPages.watch = targetPages.watch
     .replace('{embeddingOrgId}', normalisedOrgId)
-    .replace('{classTitle}', classSlug ?? '')
-  targetPages.discover = targetPages.discover.replace('{embeddingOrgId}', normalisedOrgId)
+    .replace('{partnerId}', normalisedOrgId)
+  targetPages.discover = targetPages.discover
+    .replace('{embeddingOrgId}', normalisedOrgId)
+    .replace('{partnerId}', normalisedOrgId)
   if (sessionId) {
     targetPages.joinClass = targetPages.joinClass.replace('{sessionId}', sessionId)
+    targetPages.watch = targetPages.watch.replace('{sessionId}', sessionId)
+  }
+  if (classId) {
+    targetPages.joinClass = targetPages.joinClass.replace('{classId}', classId)
+    targetPages.watch = targetPages.watch.replace('{classId}', classId)
   }
 
   const targetElement = document.getElementById(targetElementId)
@@ -238,6 +270,8 @@ export function createIframe({
   // Pass the navigation path link template to allow the page to construct hosting site links for SEO.
   if (linkTemplates?.fitnessPage)
     iframeSrc.searchParams.append('link-template-navigation-path', linkTemplates?.fitnessPage)
+
+  if (pageId) iframeSrc.searchParams.append('page-id', pageId)
 
   // Pass the list of permissions into the iframe.
   // This list has changed over time and partners can't update this package instantly.
@@ -281,8 +315,9 @@ export function createIframe({
   const loadingTimeout = setTimeout(handleTimeout, loadingTimeoutThreshold)
 
   // Try to load the head so we know if the page is working.
-  if (targetPage === 'class' || targetPage === 'discover') {
-    //Skip the pre-check and loading check because the strapi backend doesn't support it.
+  if (targetPage === 'watch' || targetPage === 'discover') {
+    // TODO: do we want to support this for the new webapp, or just try to load the page.
+    // Maybe kill the backed in error page.
     hasLoadedSuccessfully = true
   } else {
     fetch(iframeSrc, { method: 'HEAD', mode: 'cors' })
@@ -363,9 +398,10 @@ export function createIframe({
         const pageToNavigateTo = event.data.gsuNavigation.targetPage //TODO: change this to gsuNavigation.navigationAction?
         const sessionId = event.data.gsuNavigation.sessionId
         const classSlug = event.data.gsuNavigation.classSlug
+        const classId = event.data.gsuNavigation.classId
         // Make sure the page we are asking the hosting page to navigate to is a valid one of the targetPages we support.
         if (Object.keys(navigationActions).includes(pageToNavigateTo)) {
-          navigationCallBack(pageToNavigateTo, sessionId, classSlug)
+          navigationCallBack({ navigationAction: pageToNavigateTo, classId, sessionId, classSlug })
         }
       } else if (event.data.gsuAnchorNavigation) {
         // We got a request from the iframe to scroll to a location pointed to by an <a href="#sectionName">
