@@ -10,7 +10,7 @@ const targetPageUrls = {
   joinClass: 'https://lobby-embed.getsetup.io/session/{sessionId}',
   // The below will be updated to final URLs later.
   discover: 'https://embed-webapp.www.getsetup.io/discovery/{partnerId}',
-  watch: 'https://embed-webapp.www.getsetup.io/watch/{classId}',
+  watch: 'https://embed-webapp.www.getsetup.io/watch/{partnerId}/{classId}',
 }
 
 const navigationActions = {
