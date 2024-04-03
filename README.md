@@ -2,8 +2,6 @@
 This package is intended for partners of GetSetUp to include into their build processes. It will inject GetSetUp embedded content into the partner's site using iframes.
 
 ## Installing
-At the moment this package is only available if you have been given access to GetSetUp's GitHub npm repository. After you have access and your `.npmrc` is configured appropriately you can just:
-
 ```sh
 npm i @getsetup/embed
 ```
@@ -73,13 +71,7 @@ export interface CreateIframeOptions {
   sessionId?: string
 
   /** The id of your organisation as issued to you by GetSetUp. */
-  embeddingOrgId: string
-
-  /**
-   * A stable id for the device the user is using to access the parent page. Used to report analytics back to your organisation.
-   * @deprecated Use {@link analyticsInfo} instead. This will be removed in a future version.
-   */
-  deviceId?: string
+  partnerId?: string
 
   /** A flag for disabling the chat tab on the `joinClass` page. If this is true then the `tokenRequestCallBack` is not required. */
   disableChat?: boolean
@@ -88,13 +80,27 @@ export interface CreateIframeOptions {
   disableHelp?: boolean
 
   /**
+   * You should provide this optional function if you want to change the URL of the hosting page when the iframe needs to navigate.
+   *
    * This function is called when the iframe needs to navigate the top level URL.
-   * E.G: to go from `hostsite.com/online-classes/catalogue` to `hostsite.com/online-classes/join-session/98hsfnb498ywh4`
-   * @param targetPage The page to navigate to. If this is `login` the parent page should start a login flow and redirect the user to the current page once they are logged in.
+   * E.G: to go from `hostsite.com/online-classes/catalogue` to `hostsite.com/online-classes/watch-video/98hsfnb498ywh4`
+   * @param navigationAction The page to navigate to. If this is `login` the parent page should start a login flow and redirect the user to the current page once they are logged in.
+   * @param classId If the page is the watch page, then classId must be passed back to the createIframe function on the new page.
    * @param sessionId If the page is the joinClass page, then sessionId must be passed back to the createIframe function on the new page.
    * @param classSlug If the page is the joinClass page, then the classSlug will be sent to this callback. The classSlug is only for SEO use on the parent page, it is not required to be passed back to the createIframe function.
+   *
+   * If this function is not provided then the iframe will perform navigations internally without informing the parent page.
    */
-  navigationCallBack: (navigationAction: NavigationAction, sessionId?: string, classSlug?: string) => void
+  navigationCallBack?: ({
+    navigationAction,
+    sessionId,
+    classSlug,
+  }: {
+    navigationAction: NavigationAction
+    classId?: string
+    sessionId?: string
+    classSlug?: string
+  }) => void
 
   /**
    * This function is called when the iframe needs a token.
@@ -170,11 +176,11 @@ export interface CreateIframeOptions {
 - `targetElementId` (REQUIRED): The id of the element on the host page. The iframe will be created inside that element.
 - `targetPage` (REQUIRED): The GetSetUp page to render inside the iframe. One of `"learn"`, `"fitness"`, or `"joinClass"`.
 - `sessionId` (REQUIRED if `targetPage` is `joinClass`): A string that will be passed to the Join Class page so it knows what video to play.
-- `embeddingOrgId` (REQUIRED): The id string for your organisation that was issues to you by GetSetUp. Used by GetSetUp to tailor content to your organisation.
+- `partnerId` (REQUIRED): The id string for your organisation that was issues to you by GetSetUp. Used by GetSetUp to tailor content to your organisation.
 - `deviceId` (OPTIONAL): This is an optional id used for analytics that will be reported back to your organisation.
 - `disableChat` (OPTIONAL): This is an optional flag that will disable the chat tab on the `joinClass` page. If this is true then the `tokenRequestCallBack` is not required.
 - `disableHelp` (OPTIONAL): This is an optional flag that will disable the help link on the `joinClass` page.
-- `navigationCallBack` (REQUIRED): This is used to navigate between pages on the hosting site, from class listings to the page that embeds the video of the class. It is passed the `navigationAction` (`"learn" | "fitness" | "joinClass" | "login" | "home" | "help"`) and if the `navigationAction` is `"joinClass"` is is also passed the `sessionId` and `classSlug` of the class the user wants to join. The hosting site should deal with these navigation requests as appropriate.
+- `navigationCallBack` (REQUIRED if `targetPage` is `joinClass` | `learn` | `fitness`): This is used to navigate between pages on the hosting site, from class listings to the page that embeds the video of the class. It is passed the `navigationAction` (`"learn" | "fitness" | "joinClass" | "login" | "home" | "help"`) and if the `navigationAction` is `"joinClass"` is is also passed the `sessionId` and `classSlug` of the class the user wants to join. The hosting site should deal with these navigation requests as appropriate.
 - `tokenRequestCallBack` (OPTIONAL): This callback is used to get a token from the hosting page. This token is used for chat authorization, so this callback is optional if you have disabled chat, otherwise this callback is required. This callback is called when the iframe loads or the current token expires. The callback must return An encrypted JWT (JWE) that was encrypted with the public key given to you by GetSetUp. That token maybe returned as a pain string, or as a string inside a promise if your token generation is async. If no token is available (E.g. the user is not logged into your site) you may return `null`, `undefined`, nothing (`void`) or a promise that resolves to any of those. Details on constructing the token are below in the [Token](#token) section.
 - `statusCallBack` (OPTIONAL): This callback is called when the iframe is loading, has loaded, or errors. The object that is passed to this function has a `status` and a `message`. Both of those fields are for intended to inform developers what the iframe is doing, they SHOULD NOT be shown to users.
 - `linkTemplates.joinClass` (OPTIONAL): A URL template that will be used to construct links from the embedded browse pages (learn, fitness) to the page that embeds the join class page. This is an optional convenience offered to premium partners, it doesn't effect the navigation between pages which is still handled by the `navigationCallBack`. Rather it provides a link that bots can crawl to aid with SEO. See the [link templates section](#link-templates) for more information. `linkTemplates` is an object to allow for future expansion of this concept.
@@ -200,6 +206,8 @@ The `navigationCallBack` is passed a `navigationAction` argument that is one of 
 - `"login"`: This indicates that the user wants to use the embedded chat experience on the _Join Class_ and that the parent page has not already provided a token to use. You should navigate the user to your login experience and redirect them to the page they are currently on once they are authenticated.
 - `"home"`: This indicates that the user wants to navigate to the home page of the parent site. You should navigate the user as appropriate.
 - `"help"`: This indicates that the user needs help. This is handled by the parent site as appropriate. You should navigate the user to your help pages, or show a dialog over the iframe, or any other response to a help request that makes sense for your site.
+- `"discover"`: This indicates that the user wants to navigate to the page where you have embedded the GetSetUp _Discover_ page. For example the user clicked the back button on the _Watch_ page.
+- `"watch"`:  This indicates that the user wants to navigate to the page where you have embedded the GetSetUp _Watch_ page. This happens when the user clicks a class listing on the _Discover_ page, or if the user clicks a recommended class in the explore panel on the _Watch_ page. In this case the `navigationCallBack` will also be passed a `classId` that you MUST pass back to the createIframe function to ensure the class is loaded for the user, as well as a `classSlug` that you MAY use to construct a pretty URL on the page embedding the _Watch_.
 
 ### Page Layout
 The iframe is created with the following styles attached:
@@ -211,11 +219,10 @@ height: 100%;
 ```
 
 #### Browse Pages
-The browse pages (currently learn and fitness) are designed to take as much horizontal space as they are given. There is no fixed width to the browse pages. You can do whatever you wish with the horizontal layout of the page that embeds the browse pages. The height of the browse iframe is controlled by the GetSetUp iframe script. The iframe will send a postMessage event that the package code listens to, the package code will then set the height of the iframe to match teh height of the content inside it. So the height of the iframe for browse pages can be arbitrarily high. You should not count on any fixed height for the iframe.
-Write some stuff about css here.
+The browse pages (currently learn, fitness, and discover) are designed to take as much horizontal space as they are given. There is no fixed width to the browse pages. You can do whatever you wish with the horizontal layout of the page that embeds the browse pages. The height of the browse iframe is controlled by the GetSetUp iframe script. The iframe will send a postMessage event that the package code listens to, the package code will then set the height of the iframe to match teh height of the content inside it. So the height of the iframe for browse pages can be arbitrarily high. You should not count on any fixed height for the iframe.
 
-#### Join Class Page
-The iframe for the join class page is designed to take up the horizontal and vertical space it is given. You should set the width and height of the element that contains the iframe (the element identified by `targetElementId`).
+#### Join Class and Watch Pages
+The iframe for the join class and watch pages are designed to take up the horizontal and vertical space it is given. You should set the width and height of the element that contains the iframe (the element identified by `targetElementId`).
 
 For example if you wanted the Join Class iframe to occupy the entire browser window you should style the container element with:
 ```css
@@ -233,7 +240,7 @@ height: calc(100vh - 300px);
 
 That would allow space for 150px high elements at the top and bottom of the page.
 
-The Join Class iframe should support most width/height values on the containing element, but we do not recommend values smaller than (600px, 300px) or (300px, 600px).
+The Join Class and Watch iframes should support most width/height values on the containing element, but we do not recommend values smaller than (600px, 300px) or (300px, 600px).
 
 ### Token
 The token you supply to the `tokenRequestCallBack()` function must be a JSON Web Encryption (JWE) token. GetSetUp will provide you with a public key, as a JSON Web Key (JWK), that you will use to encrypt the token.
