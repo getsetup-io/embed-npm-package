@@ -212,6 +212,10 @@ export function createIframe({
     throw new Error('The targetPage should be one of "learn" | "fitness" | "joinClass" | "discover" | "watch".')
   }
 
+  if (targetPage == 'watch' && !classId) {
+    throw new Error('classId is required if you are loading a watch page.')
+  }
+
   let normalisedOrgId = ''
   if (partnerId) {
     // We don't want to transform the partner code. It is case sensitive.
