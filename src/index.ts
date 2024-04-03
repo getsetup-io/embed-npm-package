@@ -206,6 +206,10 @@ export function createIframe({
     throw new Error('sessionId is required if you are loading a join class page.')
   }
 
+  if ((targetPage == 'joinClass' || targetPage == 'learn' || targetPage == 'fitness') && !navigationCallBack) {
+    throw new Error('navigationCallBack is required if you are loading a join class, learn, or fitness page.')
+  }
+
   if (!Object.keys(targetPageUrls).includes(targetPage)) {
     throw new Error('The targetPage should be one of "learn" | "fitness" | "joinClass" | "discover" | "watch".')
   }
