@@ -75,8 +75,10 @@ export interface CreateIframeOptions {
    * @param classId If the page is the watch page, then classId must be passed back to the createIframe function on the new page.
    * @param sessionId If the page is the joinClass page, then sessionId must be passed back to the createIframe function on the new page.
    * @param classSlug If the page is the joinClass page, then the classSlug will be sent to this callback. The classSlug is only for SEO use on the parent page, it is not required to be passed back to the createIframe function.
+   *
+   * If this function is not provided then the iframe will perform navigations internally without informing the parent page.
    */
-  navigationCallBack: ({
+  navigationCallBack?: ({
     navigationAction,
     sessionId,
     classSlug,
@@ -273,6 +275,11 @@ export function createIframe({
 
   if (pageId) iframeSrc.searchParams.append('page-id', pageId)
 
+  // If there is no navigation callback then set the internal navigation flag on the iframe.
+  // This will allow the iframe to navigate to the watch page without the parent page needing to handle the navigation.
+  // This supports the simple version of the embed.
+  if (!navigationCallBack) iframeSrc.searchParams.append('internal-nav', 'true')
+
   // Pass the list of permissions into the iframe.
   // This list has changed over time and partners can't update this package instantly.
   // So we want to be able to toggle features on/off based on what permissions we have.
@@ -400,7 +407,7 @@ export function createIframe({
         const classSlug = event.data.gsuNavigation.classSlug
         const classId = event.data.gsuNavigation.classId
         // Make sure the page we are asking the hosting page to navigate to is a valid one of the targetPages we support.
-        if (Object.keys(navigationActions).includes(pageToNavigateTo)) {
+        if (Object.keys(navigationActions).includes(pageToNavigateTo) && navigationCallBack) {
           navigationCallBack({ navigationAction: pageToNavigateTo, classId, sessionId, classSlug })
         }
       } else if (event.data.gsuAnchorNavigation) {
