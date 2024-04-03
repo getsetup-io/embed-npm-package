@@ -50,7 +50,10 @@ export interface CreateIframeOptions {
   /** The id of the VOD class to play. Required if the `targetPage` is `watch`. */
   classId?: string
 
-  /** The id of your organisation as issued to you by GetSetUp. */
+  /**
+   * The id of your organisation as issued to you by GetSetUp.
+   * @deprecated Use {@link partnerId} instead. This will be removed in a future version.
+   */
   embeddingOrgId?: string
 
   /** The id of your organisation as issued to you by GetSetUp. */
