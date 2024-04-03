@@ -2,8 +2,6 @@
 This package is intended for partners of GetSetUp to include into their build processes. It will inject GetSetUp embedded content into the partner's site using iframes.
 
 ## Installing
-At the moment this package is only available if you have been given access to GetSetUp's GitHub npm repository. After you have access and your `.npmrc` is configured appropriately you can just:
-
 ```sh
 npm i @getsetup/embed
 ```
@@ -88,13 +86,27 @@ export interface CreateIframeOptions {
   disableHelp?: boolean
 
   /**
+   * You should provide this optional function if you want to change the URL of the hosting page when the iframe needs to navigate.
+   *
    * This function is called when the iframe needs to navigate the top level URL.
-   * E.G: to go from `hostsite.com/online-classes/catalogue` to `hostsite.com/online-classes/join-session/98hsfnb498ywh4`
-   * @param targetPage The page to navigate to. If this is `login` the parent page should start a login flow and redirect the user to the current page once they are logged in.
+   * E.G: to go from `hostsite.com/online-classes/catalogue` to `hostsite.com/online-classes/watch-video/98hsfnb498ywh4`
+   * @param navigationAction The page to navigate to. If this is `login` the parent page should start a login flow and redirect the user to the current page once they are logged in.
+   * @param classId If the page is the watch page, then classId must be passed back to the createIframe function on the new page.
    * @param sessionId If the page is the joinClass page, then sessionId must be passed back to the createIframe function on the new page.
    * @param classSlug If the page is the joinClass page, then the classSlug will be sent to this callback. The classSlug is only for SEO use on the parent page, it is not required to be passed back to the createIframe function.
+   *
+   * If this function is not provided then the iframe will perform navigations internally without informing the parent page.
    */
-  navigationCallBack: (navigationAction: NavigationAction, sessionId?: string, classSlug?: string) => void
+  navigationCallBack?: ({
+    navigationAction,
+    sessionId,
+    classSlug,
+  }: {
+    navigationAction: NavigationAction
+    classId?: string
+    sessionId?: string
+    classSlug?: string
+  }) => void
 
   /**
    * This function is called when the iframe needs a token.

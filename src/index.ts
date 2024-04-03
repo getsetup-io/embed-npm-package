@@ -69,6 +69,8 @@ export interface CreateIframeOptions {
   disableHelp?: boolean
 
   /**
+   * You should provide this optional function if you want to change the URL of the hosting page when the iframe needs to navigate.
+   *
    * This function is called when the iframe needs to navigate the top level URL.
    * E.G: to go from `hostsite.com/online-classes/catalogue` to `hostsite.com/online-classes/watch-video/98hsfnb498ywh4`
    * @param navigationAction The page to navigate to. If this is `login` the parent page should start a login flow and redirect the user to the current page once they are logged in.
