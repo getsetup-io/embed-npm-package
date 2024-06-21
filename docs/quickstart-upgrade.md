@@ -2,7 +2,7 @@
 
 ## CORS & CSP
 
-The GetSetUp Embedded product requires some CORS and CSP configuration by GetSetUp to allow other sites access. We have configured access for http://localhost:3001. If you require access for other development urls please contact deepak@getsetup.io.
+The GetSetUp Embedded product requires some CORS and CSP configuration by GetSetUp to allow other sites access. We have configured access for http://localhost:3001. If you require access for other development urls please contact engineering@getsetup.io.
 
 ## Site layout
 
@@ -25,25 +25,31 @@ First on a page where you want the class browsing experience create a div and se
 ```ts
 import * as GSU from '@getsetup/embed'
 
+// Read partner id from query string or hardode it
+const searchParams = new URLSearchParams()
+const partnerId = searchParams.get('partner-id') || 'OD3rF3b8P'
+
 // This function is supplied by the hosting page.
 // This function will be called by the GSU iframe when it needs to navigate.
-const navigationCallBack = (
-  navigationAction: GSU.NavigationAction;
-  classId?: string;
-) => {
-  const targetUrl = new URL(window.location.href);
+const navigationCallBack = ({
+  navigationAction,
+  classId,
+}: {
+  navigationAction: GSU.NavigationAction
+  classId?: string
+}) => {
+  const targetUrl = new URL(window.location.href)
   // The 'watch' navigation action is special because we need to pass the classId to the 'watch' page.
-  if (navigationAction == "watch" && classId) {
-    targetUrl.pathname = "/hostSitePath/watch";
-    targetUrl.searchParams.set("class-id", classId ?? "");
-  } else if (navigationAction == "discover") {
-    targetUrl.pathname = "/hostSitePath/discover";
-    targetUrl.searchParams.set("partner-id", partnerId);
-    targetUrl.searchParams.delete("class-id");
+  if (navigationAction == 'watch' && classId) {
+    targetUrl.pathname = '/hostSitePath/watch'
+    targetUrl.searchParams.set('class-id', classId ?? '')
+  } else if (navigationAction == 'discover') {
+    targetUrl.pathname = '/hostSitePath/discover'
+    targetUrl.searchParams.set('partner-id', partnerId)
+    targetUrl.searchParams.delete('class-id')
   }
-  window.location.assign(targetUrl);
-};
-
+  window.location.assign(targetUrl)
+}
 
 // Token exchange is not yet implemented with the embed webapp and not required in case of most of the partners
 const tokenRequestCallBack = () => {}
@@ -51,7 +57,7 @@ const tokenRequestCallBack = () => {}
 GSU.createIframe({
   targetElementId: 'iframe-target',
   targetPage: 'discover',
-  partnerId: 'gsudemo',
+  partnerId,
   navigationCallBack,
   tokenRequestCallBack,
   // This targetUrls object isn't necessary in production integrations, but it allows us to point to the dev environment.
@@ -75,24 +81,32 @@ Then on a second page where you want the user to watch the class:
 ```ts
 import * as GSU from '@getsetup/embed'
 
+// Read class id and partner id from query string or hardode it
+const searchParams = new URLSearchParams()
+const classId = searchParams.get('class-id') || ''
+const partnerId = searchParams.get('partner-id') || 'OD3rF3b8P'
+
 // This function is supplied by the hosting page.
 // This function will be called by the GSU iframe when it needs to navigate.
-const navigationCallBack = (
-  navigationAction: GSU.NavigationAction;
-  classId?: string;
-) => {
-  const targetUrl = new URL(window.location.href);
+const navigationCallBack = ({
+  navigationAction,
+  classId,
+}: {
+  navigationAction: GSU.NavigationAction
+  classId?: string
+}) => {
+  const targetUrl = new URL(window.location.href)
   // The 'watch' navigation action is special because we need to pass the classId to the 'watch' page.
-  if (navigationAction == "watch" && classId) {
-    targetUrl.pathname = "/hostSitePath/watch";
-    targetUrl.searchParams.set("class-id", classId ?? "");
-  } else if (navigationAction == "discover") {
-    targetUrl.pathname = "/hostSitePath/discover";
-    targetUrl.searchParams.set("partner-id", partnerId);
-    targetUrl.searchParams.delete("class-id");
+  if (navigationAction == 'watch' && classId) {
+    targetUrl.pathname = '/hostSitePath/watch'
+    targetUrl.searchParams.set('class-id', classId ?? '')
+  } else if (navigationAction == 'discover') {
+    targetUrl.pathname = '/hostSitePath/discover'
+    targetUrl.searchParams.set('partner-id', partnerId)
+    targetUrl.searchParams.delete('class-id')
   }
-  window.location.assign(targetUrl);
-};
+  window.location.assign(targetUrl)
+}
 
 // Token exchange is not yet implemented with the embed webapp and not required in case of most of the partners
 const tokenRequestCallBack = () => {}
@@ -105,7 +119,7 @@ GSU.createIframe({
   targetElementId: 'iframe-target',
   targetPage: 'watch',
   classId: classId,
-  partnerId: 'gsudemo',
+  partnerId,
   navigationCallBack,
   tokenRequestCallBack,
   // This targetUrls object isn't necessary in production integrations, but it allows us to point to the dev environment.
@@ -118,4 +132,4 @@ GSU.createIframe({
 
 ## Use the site
 
-Now that both pages are setup, you can go to the page hosting the "learn" page and click on a class. The iframe will request that the hosting page navigates to the "joinClass" page using the `navigationCallBack` we setup.
+Now that both pages are setup, you can go to the page hosting the "discover" page and click on a class. The iframe will request that the hosting page navigates to the "watch" page using the `navigationCallBack` we setup.
