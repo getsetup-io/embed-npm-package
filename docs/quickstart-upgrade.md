@@ -27,15 +27,23 @@ import * as GSU from '@getsetup/embed'
 
 // This function is supplied by the hosting page.
 // This function will be called by the GSU iframe when it needs to navigate.
-const navigationCallBack = (navigationAction: GSU.NavigationAction, classId: string) => {
-  let href = `/hostSitePath/${navigationAction}`
-
+const navigationCallBack = (
+  navigationAction: GSU.NavigationAction;
+  classId?: string;
+) => {
+  const targetUrl = new URL(window.location.href);
   // The 'watch' navigation action is special because we need to pass the classId to the 'watch' page.
-  if (navigationAction === 'watch') {
-    href = href + `?classId=${classId}`
+  if (navigationAction == "watch" && classId) {
+    targetUrl.pathname = "/hostSitePath/watch";
+    targetUrl.searchParams.set("class-id", classId ?? "");
+  } else if (navigationAction == "discover") {
+    targetUrl.pathname = "/hostSitePath/discover";
+    targetUrl.searchParams.set("partner-id", partnerId);
+    targetUrl.searchParams.delete("class-id");
   }
-  window.location.href = href
-}
+  window.location.assign(targetUrl);
+};
+
 
 // Token exchange is not yet implemented with the embed webapp and not required in case of most of the partners
 const tokenRequestCallBack = () => {}
@@ -69,15 +77,22 @@ import * as GSU from '@getsetup/embed'
 
 // This function is supplied by the hosting page.
 // This function will be called by the GSU iframe when it needs to navigate.
-const navigationCallBack = (navigationAction: GSU.NavigationAction, classId: string) => {
-  let href = `/hostSitePath/${navigationAction}`
-
+const navigationCallBack = (
+  navigationAction: GSU.NavigationAction;
+  classId?: string;
+) => {
+  const targetUrl = new URL(window.location.href);
   // The 'watch' navigation action is special because we need to pass the classId to the 'watch' page.
-  if (navigationAction === 'watch') {
-    href = href + `?classId=${classId}`
+  if (navigationAction == "watch" && classId) {
+    targetUrl.pathname = "/hostSitePath/watch";
+    targetUrl.searchParams.set("class-id", classId ?? "");
+  } else if (navigationAction == "discover") {
+    targetUrl.pathname = "/hostSitePath/discover";
+    targetUrl.searchParams.set("partner-id", partnerId);
+    targetUrl.searchParams.delete("class-id");
   }
-  window.location.href = href
-}
+  window.location.assign(targetUrl);
+};
 
 // Token exchange is not yet implemented with the embed webapp and not required in case of most of the partners
 const tokenRequestCallBack = () => {}
