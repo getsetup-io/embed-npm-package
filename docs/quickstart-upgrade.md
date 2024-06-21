@@ -26,7 +26,7 @@ First on a page where you want the class browsing experience create a div and se
 import * as GSU from '@getsetup/embed'
 
 // Read partner id from query string or hardode it
-const searchParams = new URLSearchParams()
+const searchParams = new URLSearchParams() // Please feel free to use framework specific equivalent functions here for e.g. React has useSearchParams().
 const partnerId = searchParams.get('partner-id') || 'OD3rF3b8P'
 
 // This function is supplied by the hosting page.
@@ -82,7 +82,7 @@ Then on a second page where you want the user to watch the class:
 import * as GSU from '@getsetup/embed'
 
 // Read class id and partner id from query string or hardode it
-const searchParams = new URLSearchParams()
+const searchParams = new URLSearchParams() // Please feel free to use framework specific equivalent functions here for e.g. React has useSearchParams().
 const classId = searchParams.get('class-id') || ''
 const partnerId = searchParams.get('partner-id') || 'OD3rF3b8P'
 
