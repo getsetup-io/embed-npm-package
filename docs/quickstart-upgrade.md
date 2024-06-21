@@ -51,7 +51,7 @@ const navigationCallBack = ({
   window.location.assign(targetUrl)
 }
 
-// Token exchange is not yet implemented with the embed webapp and not required in case of most of the partners
+// Token exchange is handled on a case-by-case basis. Pass this if it's not to be implemented.
 const tokenRequestCallBack = () => {}
 
 GSU.createIframe({
@@ -60,7 +60,8 @@ GSU.createIframe({
   partnerId,
   navigationCallBack,
   tokenRequestCallBack,
-  // This targetUrls object isn't necessary in production integrations, but it allows us to point to the dev environment.
+  // Note: These are overridden URLs, used and specified only while testing locally or in a staging environment.
+  // We can skip these in the production, as the embed package by default points to the production ones, but it's used for pointing to the dev environment.
   targetUrls: {
     discover: 'https://embed-webapp.www.gsudevelopment.com/discovery/{partnerId}',
     watch: 'https://embed-webapp.www.gsudevelopment.com/watch/{partnerId}/{classId}',
@@ -108,7 +109,7 @@ const navigationCallBack = ({
   window.location.assign(targetUrl)
 }
 
-// Token exchange is not yet implemented with the embed webapp and not required in case of most of the partners
+// Token exchange is handled on a case-by-case basis. Pass this if it's not to be implemented.
 const tokenRequestCallBack = () => {}
 
 GSU.createIframe({
@@ -118,7 +119,8 @@ GSU.createIframe({
   partnerId,
   navigationCallBack,
   tokenRequestCallBack,
-  // This targetUrls object isn't necessary in production integrations, but it allows us to point to the dev environment.
+  // Note: These are overridden URLs, used and specified only while testing locally or in a staging environment.
+  // We can skip these in the production, as the embed package by default points to the production ones, but it's used for pointing to the dev environment.
   targetUrls: {
     discover: 'https://embed-webapp.www.gsudevelopment.com/discovery/{partnerId}',
     watch: 'https://embed-webapp.www.gsudevelopment.com/watch/{partnerId}/{classId}',
