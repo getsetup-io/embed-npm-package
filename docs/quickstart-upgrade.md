@@ -111,10 +111,6 @@ const navigationCallBack = ({
 // Token exchange is not yet implemented with the embed webapp and not required in case of most of the partners
 const tokenRequestCallBack = () => {}
 
-//Get the sessionId from the query string.
-const urlParams = new URLSearchParams(window.location.search)
-const classId = urlParams.get('classId')
-
 GSU.createIframe({
   targetElementId: 'iframe-target',
   targetPage: 'watch',
