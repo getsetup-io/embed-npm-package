@@ -56,7 +56,7 @@ GSU.createIframe({
   tokenRequestCallBack,
   // This targetUrls object isn't necessary in production integrations, but it allows us to point to the dev environment.
   targetUrls: {
-    discovery: 'https://embed-webapp.www.gsudevelopment.com/discovery/{partnerId}',
+    discover: 'https://embed-webapp.www.gsudevelopment.com/discovery/{partnerId}',
     watch: 'https://embed-webapp.www.gsudevelopment.com/watch/{partnerId}/{classId}',
   },
 })
@@ -110,7 +110,7 @@ GSU.createIframe({
   tokenRequestCallBack,
   // This targetUrls object isn't necessary in production integrations, but it allows us to point to the dev environment.
   targetUrls: {
-    discovery: 'https://embed-webapp.www.gsudevelopment.com/discovery/{partnerId}',
+    discover: 'https://embed-webapp.www.gsudevelopment.com/discovery/{partnerId}',
     watch: 'https://embed-webapp.www.gsudevelopment.com/watch/{partnerId}/{classId}',
   },
 })
