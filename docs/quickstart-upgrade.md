@@ -23,44 +23,35 @@ First on a page where you want the class browsing experience create a div and se
 ```
 
 ```ts
-import * as GSU from "@getsetup/embed";
+import * as GSU from '@getsetup/embed'
 
 // This function is supplied by the hosting page.
-// We assume a simple navigation scheme, and we will ignore classSlug for now.
 // This function will be called by the GSU iframe when it needs to navigate.
-const navigationCallBack = (
-  navigationAction: GSU.NavigationAction,
-  sessionId?: string,
-  classSlug?: string
-) => {
-  let href = `/hostSitePath/${navigationAction}`;
+const navigationCallBack = (navigationAction: GSU.NavigationAction, classId: string) => {
+  let href = `/hostSitePath/${navigationAction}`
 
-  // The 'joinClass' navigation action is special because we need to pass the sessionId to the 'joinClass' page.
-  if (navigationAction === "joinClass" && sessionId) {
-    href = href + `?sessionId=${sessionId}`;
+  // The 'watch' navigation action is special because we need to pass the classId to the 'watch' page.
+  if (navigationAction === 'watch') {
+    href = href + `?classId=${classId}`
   }
-  window.location.href = href;
-};
+  window.location.href = href
+}
 
-// Generate a JWE token using the key provided to you by GetSetUp.
-// The tokenRequestCallBack is not currently optional,
-// but we can return nothing if we don't need chat working.
-const tokenRequestCallBack = () => {};
+// Token exchange is not yet implemented with the embed webapp and not required in case of most of the partners
+const tokenRequestCallBack = () => {}
 
 GSU.createIframe({
-  targetElementId: "iframe-target",
-  targetPage: "learn",
-  embeddingOrgId: "gsudemo",
+  targetElementId: 'iframe-target',
+  targetPage: 'discover',
+  partnerId: 'gsudemo',
   navigationCallBack,
   tokenRequestCallBack,
   // This targetUrls object isn't necessary in production integrations, but it allows us to point to the dev environment.
   targetUrls: {
-    learn: "https://embed.gsudevelopment.com/embedded/{embeddingOrgId}/learn",
-    fitness:
-      "https://embed.gsudevelopment.com/embedded/{embeddingOrgId}/fitness",
-    joinClass: "https://lobby-embed.gsudevelopment.com/session/{sessionId}",
+    discovery: 'https://embed-webapp.www.gsudevelopment.com/discovery/{partnerId}',
+    watch: 'https://embed-webapp.www.gsudevelopment.com/watch/{partnerId}/{classId}',
   },
-});
+})
 ```
 
 The content of the div will be replaced with the GetSetUp iframe.
@@ -74,49 +65,40 @@ Then on a second page where you want the user to watch the class:
 ```
 
 ```ts
-import * as GSU from "@getsetup/embed";
+import * as GSU from '@getsetup/embed'
 
 // This function is supplied by the hosting page.
-// We assume a simple navigation scheme, and we will ignore classSlug for now.
 // This function will be called by the GSU iframe when it needs to navigate.
-const navigationCallBack = (
-  navigationAction: GSU.NavigationAction,
-  sessionId?: string,
-  classSlug?: string
-) => {
-  let href = `/hostSitePath/${navigationAction}`;
+const navigationCallBack = (navigationAction: GSU.NavigationAction, classId: string) => {
+  let href = `/hostSitePath/${navigationAction}`
 
-  // The 'joinClass' navigation action is special because we need to pass the sessionId to the 'joinClass' page.
-  if (navigationAction === "joinClass" && sessionId) {
-    href = href + `?sessionId=${sessionId}`;
+  // The 'watch' navigation action is special because we need to pass the classId to the 'watch' page.
+  if (navigationAction === 'watch') {
+    href = href + `?classId=${classId}`
   }
-  window.location.href = href;
-};
+  window.location.href = href
+}
 
-// Generate a JWE token using the key provided to you by GetSetUp.
-// The tokenRequestCallBack is not currently optional,
-// but we can return nothing if we don't need chat working.
-const tokenRequestCallBack = () => {};
+// Token exchange is not yet implemented with the embed webapp and not required in case of most of the partners
+const tokenRequestCallBack = () => {}
 
 //Get the sessionId from the query string.
-const urlParams = new URLSearchParams(window.location.search);
-const sessionId = urlParams.get("sessionId");
+const urlParams = new URLSearchParams(window.location.search)
+const classId = urlParams.get('classId')
 
 GSU.createIframe({
-  targetElementId: "iframe-target",
-  targetPage: "joinClass",
-  embeddingOrgId: "gsudemo",
-  sessionId: sessionId,
+  targetElementId: 'iframe-target',
+  targetPage: 'watch',
+  classId: classId,
+  partnerId: 'gsudemo',
   navigationCallBack,
   tokenRequestCallBack,
   // This targetUrls object isn't necessary in production integrations, but it allows us to point to the dev environment.
   targetUrls: {
-    learn: "https://embed.gsudevelopment.com/embedded/{embeddingOrgId}/learn",
-    fitness:
-      "https://embed.gsudevelopment.com/embedded/{embeddingOrgId}/fitness",
-    joinClass: "https://lobby-embed.gsudevelopment.com/session/{sessionId}",
+    discovery: 'https://embed-webapp.www.gsudevelopment.com/discovery/{partnerId}',
+    watch: 'https://embed-webapp.www.gsudevelopment.com/watch/{partnerId}/{classId}',
   },
-});
+})
 ```
 
 ## Use the site
