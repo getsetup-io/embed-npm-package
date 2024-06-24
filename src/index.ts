@@ -129,6 +129,16 @@ export interface CreateIframeOptions {
      * For example: `https://example.com/online-classes/fitness/`.
      */
     fitnessPage?: string
+    /**
+     * This template should be the URL of the discover page on your site.
+     * For example: `https://example.com/online-classes/discover/`.
+     */
+    discoverPage?: string
+    /**
+     * This template should be the URL of the watch page on your site.
+     * For example: `https://example.com/online-classes/watch/`.
+     */
+    watchPage?: string
   }
 
   /** Optional - Allows the caller to override urls that will be loaded in the iframe. Used for testing. */
@@ -285,6 +295,13 @@ export function createIframe({
   // Pass the navigation path link template to allow the page to construct hosting site links for SEO.
   if (linkTemplates?.fitnessPage)
     iframeSrc.searchParams.append('link-template-navigation-path', linkTemplates?.fitnessPage)
+
+  // Pass the navigation path link template to allow the page to construct hosting site links for SEO.
+  if (linkTemplates?.discoverPage)
+    iframeSrc.searchParams.append('link-template-navigation-path', linkTemplates?.discoverPage)
+
+  // Pass the navigation path link template to allow the page to construct hosting site links for SEO.
+  if (linkTemplates?.watchPage) iframeSrc.searchParams.append('link-template-navigation-path', linkTemplates?.watchPage)
 
   if (pageId) iframeSrc.searchParams.append('page-id', pageId)
 
