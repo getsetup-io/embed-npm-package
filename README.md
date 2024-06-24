@@ -49,7 +49,7 @@ const navigationCallBack = ({
 const tokenRequestCallBack = () => {}
 
 GSU.createIframe({
-  targetElementId: 'id-of-target-element',
+  targetElementId: '--ID-OF-THE-TARGET-ELEMENT--',
   targetPage: 'discover', // or 'watch'
   partnerId,
   navigationCallBack,
