@@ -19,7 +19,7 @@ import * as GSU from '@getsetup/embed'
 
 // Read partner id from query string or hardode it
 const searchParams = new URLSearchParams() // Please feel free to use framework specific equivalent functions here for e.g. React has useSearchParams().
-const partnerId = searchParams.get('partner-id') || 'my-awesome-company'
+const partnerId = searchParams.get('partner-id') || 'gsu-demo'
 
 // This function is supplied by the hosting page.
 // They should preform any checking and sanitation they wish to here.
