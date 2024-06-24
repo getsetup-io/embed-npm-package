@@ -88,7 +88,7 @@ export interface CreateIframeOptions {
   /** Which GetSetUp Page to display in the iframe. */
   targetPage: TargetPage // "discover" | "watch"
 
-  /** The id of the class session to play. Required if the `targetPage` is `watch`. */
+  /** The id of the class to play. Required if the `targetPage` is `watch`. */
   classId?: string
 
   /** The id of your organisation as issued to you by GetSetUp. */
@@ -155,6 +155,16 @@ export interface CreateIframeOptions {
      * For example: `https://example.com/online-classes/fitness/`.
      */
     fitnessPage?: string
+    /**
+     * This template should be the URL of the fitness page on your site.
+     * For example: `https://example.com/online-classes/discover/`.
+     */
+    discoverPage?: string
+    /**
+     * This template should be the URL of the fitness page on your site.
+     * For example: `https://example.com/online-classes/watch/`.
+     */
+    watchPage?: string
   }
 
   /**
@@ -197,7 +207,7 @@ export interface CreateIframeOptions {
 - `deviceId` (OPTIONAL): This is an optional id used for analytics that will be reported back to your organisation.
 - `disableChat` (OPTIONAL): This is an optional flag that will disable the chat tab on the `watch` page..
 - `disableHelp` (OPTIONAL): This is an optional flag that will disable the help link on the `watch` page.
-- `navigationCallBack` (REQUIRED if `targetPage` is `discover` | `watch`): This is used to navigate between pages on the hosting site, from class listings to the page that embeds the video of the class. It is passed the `navigationAction` (`"discover" | "watch" | "login" | "home" | "help"`) and if the `navigationAction` is `"joinClass"` is is also passed the `classId` and `classSlug` of the class the user wants to join. The hosting site should deal with these navigation requests as appropriate.
+- `navigationCallBack` (REQUIRED if `targetPage` is `discover` | `watch`): This is used to navigate between pages on the hosting site, from class listings to the page that embeds the video of the class. It is passed the `navigationAction` (`"discover" | "watch" | "login" | "home" | "help"`) and if the `navigationAction="watch"` is also passed the `classId` and `classSlug` of the class the user wants to join. The hosting site should deal with these navigation requests as appropriate.
 - `tokenRequestCallBack` (OPTIONAL): This callback is used to get a token from the hosting page. This token is used for chat authorization, so this callback is optional if you have disabled chat, otherwise this callback is required. This callback is called when the iframe loads or the current token expires. The callback must return An encrypted JWT (JWE) that was encrypted with the public key given to you by GetSetUp. That token maybe returned as a pain string, or as a string inside a promise if your token generation is async. If no token is available (E.g. the user is not logged into your site) you may return `null`, `undefined`, nothing (`void`) or a promise that resolves to any of those. Details on constructing the token are below in the [Token](#token) section.
 - `statusCallBack` (OPTIONAL): This callback is called when the iframe is loading, has loaded, or errors. The object that is passed to this function has a `status` and a `message`. Both of those fields are for intended to inform developers what the iframe is doing, they SHOULD NOT be shown to users.
 - `linkTemplates.joinClass` (OPTIONAL): A URL template that will be used to construct links from the embedded browse pages (learn, fitness) to the page that embeds the join class page. This is an optional convenience offered to premium partners, it doesn't effect the navigation between pages which is still handled by the `navigationCallBack`. Rather it provides a link that bots can crawl to aid with SEO. See the [link templates section](#link-templates) for more information. `linkTemplates` is an object to allow for future expansion of this concept.
@@ -244,9 +254,9 @@ height: 100%;
 
 The browse pages (currently learn, fitness, and discover) are designed to take as much horizontal space as they are given. There is no fixed width to the browse pages. You can do whatever you wish with the horizontal layout of the page that embeds the browse pages. The height of the browse iframe is controlled by the GetSetUp iframe script. The iframe will send a postMessage event that the package code listens to, the package code will then set the height of the iframe to match teh height of the content inside it. So the height of the iframe for browse pages can be arbitrarily high. You should not count on any fixed height for the iframe.
 
-#### Join Class and Watch Pages
+#### Watch Pages
 
-The iframe for the join class and watch pages are designed to take up the horizontal and vertical space it is given. You should set the width and height of the element that contains the iframe (the element identified by `targetElementId`).
+The iframe for the watch pages are designed to take up the horizontal and vertical space it is given. You should set the width and height of the element that contains the iframe (the element identified by `targetElementId`).
 
 For example if you wanted the Join Class iframe to occupy the entire browser window you should style the container element with:
 
@@ -266,7 +276,7 @@ height: calc(100vh - 300px);
 
 That would allow space for 150px high elements at the top and bottom of the page.
 
-The Join Class and Watch iframes should support most width/height values on the containing element, but we do not recommend values smaller than (600px, 300px) or (300px, 600px).
+The Watch iframes should support most width/height values on the containing element, but we do not recommend values smaller than (600px, 300px) or (300px, 600px).
 
 ### Token
 
@@ -310,21 +320,21 @@ const token = new jose.EncryptJWT({})
 
 ### Link Templates
 
-> `linkTemplates` is an object to allow for future expansion of this concept, but only the `joinClass`, `learnPage`, and `fitnessPage` link templates are currently supported.
+> `linkTemplates` is an object to allow for future expansion of this concept, but only the `joinClass`, `learnPage`, `fitnessPage`, `discoverPage` and `watchPage` link templates are currently supported.
 
-The Link Template is an optional URL template passed into the `GSU.createIframe` function as a string. If present in the string, the tokens `{classSlug}` and `{sessionId}` are replaced with their values.
+The Link Template is an optional URL template passed into the `GSU.createIframe` function as a string. If present in the string, the tokens `{classSlug}` and `{classId}` are replaced with their values.
 
 This option is designed to allow premium partners control over the links embedded on their site. Navigation between pages is handled by the `NavigationActions` passed to the [navigationCallback](#navigation-actions). The Link Template allows premium partners to control the format of links that the embedded learn and fitness pages show.
 
-As an example, imagine the site example.com is embedded GetSetUp into it's pages. Example.com uses a path based url format and hosts the GetSetUp fitness page at `example.com/classes/fitness`. Example.com hosts the join class page at `example.com/watch` with the class slug and session id in the path, e.g. `example.com/watch/cooking-with-rice/wdf80h32b`. To achieve crawlable links on their site, example.com should pass in a linkTemplate of the form `https://example.com/watch/{classSlug}/{sessionId}`.
+As an example, imagine the site example.com is embedded GetSetUp into it's pages. Example.com uses a path based url format and hosts the GetSetUp fitness page at `example.com/classes/fitness`. Example.com hosts the join class page at `example.com/watch` with the class slug and class id in the path, e.g. `example.com/watch/cooking-with-rice/wdf80h32b`. To achieve crawlable links on their site, example.com should pass in a linkTemplate of the form `https://example.com/watch/{classSlug}/{classId}`.
 
-If example.com used query strings to route between embedded pages then their URLs might look like this: `example.com/watch?session-id=wdf80h32b` in which case their `linkTemplate` should be: `example.com/watch?session-id={sessionId}`.
+If example.com used query strings to route between embedded pages then their URLs might look like this: `example.com/watch?class-id=wdf80h32b` in which case their `linkTemplate` should be: `example.com/watch?class-id={classId}`.
 
 Please note:
 
 - There is no sanity checking preformed on the Link Template, it is 100% under the control of the integrating partner.
 - If you require different URLs on different pages, then you can provide different `linkTemplate`s on those pages.
-- Only the tokens `{classSlug}` and `{sessionId}` are supported in `linkTemplate`s. Anything else will be left unchanged.
+- Only the tokens `{classSlug}` and `{classId}` are supported in `linkTemplate`s. Anything else will be left unchanged.
 
 ### Clean Up
 
