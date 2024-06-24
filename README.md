@@ -26,16 +26,18 @@ const partnerId = searchParams.get('partner-id') || 'my-awesome-company'
 const navigationCallBack = ({
   navigationAction,
   classId,
+  classSlug,
 }: {
   navigationAction: GSU.NavigationAction
   classId?: string
+  classSlug?: string
 }) => {
   const targetUrl = new URL(window.location.href)
   // The 'watch' navigation action is special because we need to pass the classId to the 'watch' page.
-  if (navigationAction == 'watch' && classId) {
-    targetUrl.pathname = '/hostSitePath/watch'
+  if (navigationAction === 'watch' && classId) {
+    targetUrl.pathname = `/hostSitePath/watch/${classSlug ?? 'class'}`
     targetUrl.searchParams.set('class-id', classId ?? '')
-  } else if (navigationAction == 'discover') {
+  } else if (navigationAction === 'discover') {
     targetUrl.pathname = '/hostSitePath/discover'
     targetUrl.searchParams.set('partner-id', partnerId)
     targetUrl.searchParams.delete('class-id')
@@ -45,14 +47,6 @@ const navigationCallBack = ({
 
 // Token exchange is handled on a case-by-case basis. Pass this if it's not to be implemented.
 const tokenRequestCallBack = () => {}
-
-createIframe({
-  targetElementId: 'id-of-target-element',
-  targetPage: 'learn',
-  embeddingOrgId: 'my-awesome-company',
-  navigationCallBack,
-  tokenRequestCallBack,
-})
 
 GSU.createIframe({
   targetElementId: 'id-of-target-element',
@@ -113,10 +107,19 @@ export interface CreateIframeOptions {
    * E.G: to go from `hostsite.com/online-classes/catalogue` to `hostsite.com/online-classes/watch-video/98hsfnb498ywh4`
    * @param navigationAction The page to navigate to. If this is `login` the parent page should start a login flow and redirect the user to the current page once they are logged in.
    * @param classId If the page is the watch page, then classId must be passed back to the createIframe function on the new page.
+   * @param classSlug If the page is the watch page, then the classSlug will be sent to this callback. The classSlug is only for SEO use on the parent page, it is not required to be passed back to the createIframe function.
    *
    * If this function is not provided then the iframe will perform navigations internally without informing the parent page.
    */
-  navigationCallBack?: ({ navigationAction, classId }: { navigationAction: NavigationAction; classId?: string }) => void
+  navigationCallBack?: ({
+    navigationAction,
+    classId,
+    classSlug,
+  }: {
+    navigationAction: NavigationAction
+    classId?: string
+    classSlug?: string
+  }) => void
 
   /**
    * This function is called when the iframe needs a token.
@@ -264,6 +267,46 @@ height: calc(100vh - 300px);
 That would allow space for 150px high elements at the top and bottom of the page.
 
 The Join Class and Watch iframes should support most width/height values on the containing element, but we do not recommend values smaller than (600px, 300px) or (300px, 600px).
+
+### Token
+
+The token you supply to the `tokenRequestCallBack()` function must be a JSON Web Encryption (JWE) token. GetSetUp will provide you with a public key, as a JSON Web Key (JWK), that you will use to encrypt the token.
+
+The token should be encrypted with the following settings:
+
+- alg: `RSA-OAEP-256`
+- enc: `A256GCM`
+
+The payload of the token must contain:
+
+- sub: The subject of the token. This should be a stable user id that you can understand if it is sent back to you in analytics reporting.
+- iss: The issuer of the token. This must be the `embeddingOrgId` as issued to you by GetSetUp.
+- aud: The audience for the token. This must be the string `getsetup`.
+- exp: The timestamp at which this token is no longer valid. This is a JSON numeric value representing the number of seconds from 1970-01-01T00:00:00Z UTC. See [exp in RFC7519](https://www.rfc-editor.org/rfc/rfc7519#section-4.1.4) and the [NumericDate format in the same RFC](https://www.rfc-editor.org/rfc/rfc7519#section-2)
+
+#### Token refresh
+
+The GetSetUp chat experience will use the token expiry time (`exp`) to determine when to check for a new token. The chat experience will ask the parent page for a new token using the `tokenRequestCallBack` 30 seconds before the token will expire. If the chat experience receives a token that is not valid it will continue to use the existing valid token it has until it expires.
+
+The chat experience places a floor on the minimum length of time a token can be valid for. If the token is valid for less than one minute, the chat experience will treat the token as being valid for one minute. This is to prevent misconfiguration from DOSing GetSetup or, via the `tokenRequestCallBack`, the parent page with tokens that immediately expire.
+
+When the token expires the user will be logged out of the chat experience and will have to click a button to initiate the login flow again. The chat experience will not automatically retry to get a valid token after receiving an invalid token.
+
+An example of encrypting a token with the [jose npm package](https://www.npmjs.com/package/jose):
+
+```ts
+const publicKey = {
+  /* JWK given to you by GetSetUp. */
+}
+
+const token = new jose.EncryptJWT({})
+  .setProtectedHeader({ alg: 'RSA-OAEP-256', enc: 'A256GCM' })
+  .setIssuer('my-awesome-company') // Your embeddingOrgId
+  .setAudience('getsetup')
+  .setSubject('ssd8y34bn87sfgh') // The userId
+  .setExpirationTime('10m') // Expire 10 minutes from now.
+  .encrypt(publicKey)
+```
 
 ### Link Templates
 
