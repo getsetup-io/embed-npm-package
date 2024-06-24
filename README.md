@@ -35,7 +35,7 @@ const navigationCallBack = ({
   const targetUrl = new URL(window.location.href)
   // The 'watch' navigation action is special because we need to pass the classId to the 'watch' page.
   if (navigationAction === 'watch' && classId) {
-    targetUrl.pathname = `/hostSitePath/watch/${classSlug ?? 'class'}`
+    targetUrl.pathname = `/hostSitePath/watch/${classSlug ?? ''}`
     targetUrl.searchParams.set('class-id', classId ?? '')
   } else if (navigationAction === 'discover') {
     targetUrl.pathname = '/hostSitePath/discover'
