@@ -420,7 +420,8 @@ export function createIframe({
         hasLoadedSuccessfully = true
       } else if (event.data.gsuDocumentHeight) {
         // Responsive styling, but the joinClass page doesn't need it, that handles sizing a different way.
-        if (targetPage != 'joinClass') gsuEmbeddedIframe.style.height = `${event.data.gsuDocumentHeight}px`
+        if (targetPage !== 'joinClass' && targetPage !== 'watch')
+          gsuEmbeddedIframe.style.height = `${event.data.gsuDocumentHeight}px`
 
         if (!hasLoadedSuccessfully) {
           // We only want to fire this callback once when the page first loads.
