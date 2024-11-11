@@ -11,6 +11,7 @@ const targetPageUrls = {
   // The below will be updated to final URLs later.
   article: 'https://embed-webapp.www.getsetup.io/article/{partnerId}/{articleId}',
   discover: 'https://embed-webapp.www.getsetup.io/discovery/{partnerId}',
+  series: 'https://embed-webapp.www.getsetup.io/series/{partnerId}/{seriesId}',
   watch: 'https://embed-webapp.www.getsetup.io/watch/{partnerId}/{classId}',
 }
 
@@ -47,6 +48,9 @@ export interface CreateIframeOptions {
 
   /** The id of the article. Required if the `targetPage` is `article`. */
   articleId?: string
+
+  /** The id of the series. Required if the `targetPage` is `series`. */
+  seriesId?: string
 
   /** The id of the class session to play. Required if the `targetPage` is `joinClass`. */
   sessionId?: string
@@ -97,6 +101,7 @@ export interface CreateIframeOptions {
     classId?: string
     sessionId?: string
     classSlug?: string
+    seriesId?: string
   }) => void
 
   /**
@@ -145,6 +150,11 @@ export interface CreateIframeOptions {
      */
     discoverPage?: string
     /**
+     * This template should be the URL of the series page on your site.
+     * For example: `https://example.com/online-classes/series/`.
+     */
+    seriesPage?: string
+    /**
      * This template should be the URL of the watch page on your site.
      * For example: `https://example.com/online-classes/watch/`.
      */
@@ -192,6 +202,7 @@ interface EventFromIframe {
     gsuNavigation?: {
       targetPage?: any
       articleId?: any
+      seriesId?: any
       sessionId?: any
       classId?: any
       classSlug?: any
@@ -212,6 +223,7 @@ export function createIframe({
   sessionId,
   classId,
   articleId,
+  seriesId,
   embeddingOrgId,
   partnerId,
   deviceId,
@@ -247,6 +259,10 @@ export function createIframe({
     throw new Error('articleId is required if you are loading a article page.')
   }
 
+  if (targetPage == 'series' && !seriesId) {
+    throw new Error('seriesId is required if you are loading a series page.')
+  }
+
   let normalisedOrgId = ''
   if (partnerId) {
     // We don't want to transform the partner code. It is case sensitive.
@@ -271,6 +287,9 @@ export function createIframe({
   targetPages.article = targetPages.article
     .replace('{embeddingOrgId}', normalisedOrgId)
     .replace('{partnerId}', normalisedOrgId)
+  targetPages.series = targetPages.series
+    .replace('{embeddingOrgId}', normalisedOrgId)
+    .replace('{partnerId}', normalisedOrgId)
   if (sessionId) {
     targetPages.joinClass = targetPages.joinClass.replace('{sessionId}', sessionId)
     targetPages.watch = targetPages.watch.replace('{sessionId}', sessionId)
@@ -281,6 +300,9 @@ export function createIframe({
   }
   if (articleId) {
     targetPages.article = targetPages.article.replace('{articleId}', articleId)
+  }
+  if (seriesId) {
+    targetPages.series = targetPages.series.replace('{seriesId}', seriesId)
   }
 
   const targetElement = document.getElementById(targetElementId)
@@ -374,7 +396,7 @@ export function createIframe({
   const loadingTimeout = setTimeout(handleTimeout, loadingTimeoutThreshold)
 
   // Try to load the head so we know if the page is working.
-  if (targetPage === 'watch' || targetPage === 'discover' || targetPage === 'article') {
+  if (targetPage === 'watch' || targetPage === 'discover' || targetPage === 'article' || targetPage === 'series') {
     // TODO: do we want to support this for the new webapp, or just try to load the page.
     // Maybe kill the backed in error page.
     hasLoadedSuccessfully = true
@@ -460,9 +482,10 @@ export function createIframe({
         const classSlug = event.data.gsuNavigation.classSlug
         const classId = event.data.gsuNavigation.classId
         const articleId = event.data.gsuNavigation.articleId
+        const seriesId = event.data.gsuNavigation.seriesId
         // Make sure the page we are asking the hosting page to navigate to is a valid one of the targetPages we support.
         if (Object.keys(navigationActions).includes(pageToNavigateTo) && navigationCallBack) {
-          navigationCallBack({ navigationAction: pageToNavigateTo, articleId, classId, sessionId, classSlug })
+          navigationCallBack({ navigationAction: pageToNavigateTo, articleId, classId, sessionId, classSlug, seriesId })
         }
       } else if (event.data.gsuAnchorNavigation) {
         // We got a request from the iframe to scroll to a location pointed to by an <a href="#sectionName">
