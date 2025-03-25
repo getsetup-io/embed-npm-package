@@ -13,6 +13,7 @@ const targetPageUrls = {
   discover: 'https://embed-webapp.www.getsetup.io/discovery/{partnerId}',
   series: 'https://embed-webapp.www.getsetup.io/series/{partnerId}/{seriesId}',
   watch: 'https://embed-webapp.www.getsetup.io/watch/{partnerId}/{classId}',
+  watchLive: 'https://embed-webapp.www.getsetup.io/watch/{partnerId}/live/{sessionId}',
 }
 
 const navigationActions = {
@@ -159,6 +160,11 @@ export interface CreateIframeOptions {
      * For example: `https://example.com/online-classes/watch/`.
      */
     watchPage?: string
+    /**
+     * This template should be the URL of the watch live class page on your site.
+     * For example: `https://example.com/online-classes/watch/live`.
+     */
+    watchLivePage?: string
   }
 
   /** Optional - Allows the caller to override urls that will be loaded in the iframe. Used for testing. */
@@ -248,11 +254,17 @@ export function createIframe({
   }
 
   if (!Object.keys(targetPageUrls).includes(targetPage)) {
-    throw new Error('The targetPage should be one of "learn" | "fitness" | "joinClass" | "discover" | "watch".')
+    throw new Error(
+      'The targetPage should be one of "learn" | "fitness" | "joinClass" | "discover" | "watch" | "watchLive".',
+    )
   }
 
   if (targetPage == 'watch' && !classId) {
     throw new Error('classId is required if you are loading a watch page.')
+  }
+
+  if (targetPage == 'watchLive' && !sessionId) {
+    throw new Error('sessionId is required if you are loading a watchLive page.')
   }
 
   if (targetPage == 'article' && !articleId) {
@@ -281,6 +293,9 @@ export function createIframe({
   targetPages.watch = targetPages.watch
     .replace('{embeddingOrgId}', normalisedOrgId)
     .replace('{partnerId}', normalisedOrgId)
+  targetPages.watchLive = targetPages.watchLive
+    .replace('{embeddingOrgId}', normalisedOrgId)
+    .replace('{partnerId}', normalisedOrgId)
   targetPages.discover = targetPages.discover
     .replace('{embeddingOrgId}', normalisedOrgId)
     .replace('{partnerId}', normalisedOrgId)
@@ -293,6 +308,7 @@ export function createIframe({
   if (sessionId) {
     targetPages.joinClass = targetPages.joinClass.replace('{sessionId}', sessionId)
     targetPages.watch = targetPages.watch.replace('{sessionId}', sessionId)
+    targetPages.watchLive = targetPages.watchLive.replace('{sessionId}', sessionId)
   }
   if (classId) {
     targetPages.joinClass = targetPages.joinClass.replace('{classId}', classId)
@@ -346,6 +362,8 @@ export function createIframe({
 
   // Pass the navigation path link template to allow the page to construct hosting site links for SEO.
   if (linkTemplates?.watchPage) iframeSrc.searchParams.append('link-template-navigation-path', linkTemplates?.watchPage)
+  if (linkTemplates?.watchLivePage)
+    iframeSrc.searchParams.append('link-template-navigation-path', linkTemplates?.watchLivePage)
 
   if (pageId) iframeSrc.searchParams.append('page-id', pageId)
 

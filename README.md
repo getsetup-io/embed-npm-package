@@ -165,6 +165,11 @@ export interface CreateIframeOptions {
      * For example: `https://example.com/online-classes/watch/`.
      */
     watchPage?: string
+    /**
+     * This template should be the URL of the watch live class page on your site.
+     * For example: `https://example.com/online-classes/watch/live`.
+     */
+    watchLivePage?: string
   }
 
   /**
@@ -215,6 +220,7 @@ export interface CreateIframeOptions {
 - `linkTemplates.fitnessPage` (OPTIONAL): A URL template that will be used to construct links from one embedded browse pages (ex. learn) to the fitness page. This is an optional convenience offered to premium partners, it doesn't effect the navigation between pages which is still handled by the `navigationCallBack`. Rather it provides a link that bots can crawl to aid with SEO. See the [link templates section](#link-templates) for more information.
 - `linkTemplates.discoverPage` (OPTIONAL): A URL template that will be used to construct links from one embedded browse pages (ex. discover) to the SEO friendly url page. This is an optional convenience offered to premium partners, it doesn't effect the navigation between pages which is still handled by the `navigationCallBack`. Rather it provides a link that bots can crawl to aid with SEO. See the [link templates section](#link-templates) for more information.
 - `linkTemplates.watchPage` (OPTIONAL): A URL template that will be used to construct links from one embedded watch pages to the page that embeds the watch class page. This is an optional convenience offered to premium partners, it doesn't effect the navigation between pages which is still handled by the `navigationCallBack`. Rather it provides a link that bots can crawl to aid with SEO. See the [link templates section](#link-templates) for more information.
+- `linkTemplates.watchLivePage` (OPTIONAL): A URL template that will be used to construct links from one embedded watch live class pages to the page that embeds the watch live class page. This is an optional convenience offered to premium partners, it doesn't effect the navigation between pages which is still handled by the `navigationCallBack`. Rather it provides a link that bots can crawl to aid with SEO. See the [link templates section](#link-templates) for more information.
 
 - `targetUrls` (OPTIONAL): Allow the caller to override the the urls of the pages to be embedded. Used for testing, this should not be required in production. Is an object of the form :
 
