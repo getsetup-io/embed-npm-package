@@ -193,6 +193,9 @@ export interface CreateIframeOptions {
     deviceId?: string
   }
   pageId?: string
+
+  /** Optional locale for the embedded content (e.g. 'es-US', 'hi-IN', 'zh-SG'). If not provided, defaults to en-US. */
+  locale?: string
 }
 
 export interface IframeInstance {
@@ -244,6 +247,7 @@ export function createIframe({
   themeOptions,
   analyticsInfo,
   pageId,
+  locale,
 }: CreateIframeOptions): IframeInstance {
   if (targetPage == 'joinClass' && !sessionId) {
     throw new Error('sessionId is required if you are loading a join class page.')
@@ -366,6 +370,7 @@ export function createIframe({
     iframeSrc.searchParams.append('link-template-navigation-path', linkTemplates?.watchLivePage)
 
   if (pageId) iframeSrc.searchParams.append('page-id', pageId)
+  if (locale) iframeSrc.searchParams.append('locale', locale)
 
   // If there is no navigation callback then set the internal navigation flag on the iframe.
   // This will allow the iframe to navigate to the watch page without the parent page needing to handle the navigation.
